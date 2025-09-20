@@ -1,0 +1,27 @@
+﻿<Window x:Class="Chess_UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Chess_UI"
+        mc:Ignorable="d"
+        Title="Шахматы" SizeToContent="Height" Width="600"
+        Icon="/Assets/icon.ico"
+        WindowStartupLocation ="CenterScreen"
+        Background="Black">
+    <Viewbox>
+        <Grid x:Name="Board_Grid" 
+              Width="600" 
+              Height="600">
+            <Grid.Background>
+                <ImageBrush ImageSource="/Assets/Board.png"></ImageBrush>
+            </Grid.Background>
+
+            <UniformGrid x:Name="Piece_Grid"
+                         Rows="8"
+                         Columns="8"
+                         RenderOptions.BitmapScalingMode="HighQuality">
+            </UniformGrid>
+        </Grid>
+    </Viewbox>
+</Window>
