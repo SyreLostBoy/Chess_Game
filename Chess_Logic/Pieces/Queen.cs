@@ -17,8 +17,24 @@ namespace Chess_Logic
         {
             return new AQueen(Color, Has_Moved);
         }
+        public override IEnumerable<AMove> Get_Moves(APosition from_pos, AsBoard board)
+        {
+            return Get_Move_Positions_In_Directions(from_pos, board, Directions).Select(to_pos => new AMove_Normal(from_pos, to_pos));
+        }
+
         public override EPiece_Type Type => EPiece_Type.Queen;
         public override EColor Color { get; }
 
+        private static readonly ADirection[] Directions = new ADirection[]
+        {
+           ADirection.North,
+           ADirection.East,
+           ADirection.West,
+           ADirection.South,
+           ADirection.North_West,
+           ADirection.North_East,
+           ADirection.South_West,
+           ADirection.South_East
+        };
     }
 }

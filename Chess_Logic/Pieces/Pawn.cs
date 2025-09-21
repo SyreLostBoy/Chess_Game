@@ -17,6 +17,7 @@ namespace Chess_Logic
         {
             return new APawn(Color, Has_Moved);
         }
+
         public override EPiece_Type Type => EPiece_Type.Pawn;
         public override EColor Color { get; }
 
