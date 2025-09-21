@@ -16,7 +16,7 @@ namespace Chess_Logic
 
     public static class APlayer_Extensions
     {
-        public static EColor Determ_Turn(this EColor current_player_color)
+        public static EColor Opponent(this EColor current_player_color)
         {
             switch (current_player_color)
             {

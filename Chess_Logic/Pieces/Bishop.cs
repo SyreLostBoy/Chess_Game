@@ -19,7 +19,10 @@ namespace Chess_Logic
         }
         public override IEnumerable<AMove> Get_Moves(APosition from_pos, AsBoard board)
         {
-            return Get_Move_Positions_In_Directions(from_pos, board, Directions).Select(to_pos => new AMove_Normal(from_pos , to_pos) );
+            foreach (APosition to_pos in Get_Move_Positions_In_Directions(from_pos, board, Directions))
+            {
+                yield return new AMove_Normal(from_pos, to_pos);
+            }
         }
         public override EPiece_Type Type => EPiece_Type.Bishop;
         public override EColor Color { get; }

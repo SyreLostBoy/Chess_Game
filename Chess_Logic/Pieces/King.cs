@@ -17,8 +17,46 @@ namespace Chess_Logic
         {
             return new AKing(Color, Has_Moved);
         }
+        public override IEnumerable<AMove> Get_Moves(APosition from_pos, AsBoard board)
+        {
+            foreach (APosition to_pos in Get_Move_Positions(from_pos, board) )
+            {
+                yield return new AMove_Normal(from_pos, to_pos);
+            }
+        }
         public override EPiece_Type Type => EPiece_Type.King;
         public override EColor Color { get; }
 
+        private IEnumerable<APosition> Get_Move_Positions(APosition from_pos, AsBoard board)
+        {
+            APosition to_pos;
+
+            foreach (ADirection dir in Directions)
+            {
+                to_pos = from_pos + dir;
+
+                if (!AsBoard.Is_Inside_Board(to_pos))
+                {
+                    continue;
+                }
+
+                if (board.Is_Empty(to_pos) || board[to_pos].Color != this.Color)
+                {
+                    yield return to_pos;
+                }
+            }
+        }
+
+        private static readonly ADirection[] Directions = new ADirection[]
+        {
+           ADirection.North,
+           ADirection.East,
+           ADirection.West,
+           ADirection.South,
+           ADirection.North_West,
+           ADirection.North_East,
+           ADirection.South_West,
+           ADirection.South_East
+        };
     }
 }

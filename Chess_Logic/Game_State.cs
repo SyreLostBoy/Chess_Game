@@ -15,6 +15,26 @@ namespace Chess_Logic
             Board = board;
         }
 
+        public IEnumerable<AMove> Get_Legal_Moves_For_Piece(APosition pos)
+        {
+            APiece piece;
+
+            if (Board.Is_Empty(pos) || Board[pos].Color != Current_Player_Color)
+            {
+                return Enumerable.Empty<AMove>();
+            }
+
+            piece = Board[pos];
+
+            return piece.Get_Moves(pos, Board);
+        }
+
+        public void Act_Move(AMove move)
+        {
+            move.Act(Board);
+            Current_Player_Color = Current_Player_Color.Opponent();
+        }
+
         public AsBoard Board { get; }
         public EColor Current_Player_Color { get; private set; }
     }

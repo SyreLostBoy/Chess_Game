@@ -13,8 +13,11 @@ namespace Chess_Logic
     {
         public abstract APiece Copy();
         public abstract IEnumerable<AMove> Get_Moves(APosition from_pos, AsBoard board);
+        public abstract EPiece_Type Type { get; }
+        public abstract EColor Color { get; }
+        public bool Has_Moved { get; set; } = false;
         protected IEnumerable<APosition> Get_Move_Positions_In_Direction(APosition from, AsBoard board, ADirection direction)
-        {// Возвращает список ходов в заданном направлении
+        {// Возвращает список позиций для хода в заданном направлении
 
             APiece piece;
 
@@ -38,14 +41,9 @@ namespace Chess_Logic
         }
         
         protected IEnumerable<APosition> Get_Move_Positions_In_Directions(APosition from, AsBoard board, ADirection[] directions)
-        {// Возвращает список всевозможных ходов
+        {// Возвращает список всевозможных позиций для хода
 
             return directions.SelectMany(direction => Get_Move_Positions_In_Direction(from, board, direction) );
         }
-
-        public abstract EPiece_Type Type { get; }
-        public abstract EColor Color { get; }
-        public bool Has_Moved { get; set; } = false;
-
     }
 }
