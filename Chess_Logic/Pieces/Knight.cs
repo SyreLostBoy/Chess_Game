@@ -59,8 +59,6 @@ namespace Chess_Logic
                     yield return to_pos;
                 }
             }
-
-            //return Get_Potential_To_Positions(from_pos).Where(pos => ABoard.Is_Inside_Board(to_pos) && (board.Is_Empty(to_pos) || board[to_pos].Color != this.Color) );
         }
 
     }

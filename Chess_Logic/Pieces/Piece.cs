@@ -33,7 +33,7 @@ namespace Chess_Logic
             //{
             //    APiece piece = board[move.To_Position];
             //    return piece != null && piece.Type == EPiece_Type.King;
-            //});
+            //}); 
         }
 
         public abstract EPiece_Type Type { get; }

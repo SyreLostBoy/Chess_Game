@@ -36,9 +36,44 @@ namespace Chess_Logic
         {
             move.Act(Board);
             Current_Player_Color = Current_Player_Color.Opponent();
+
+            Check_For_Game_Over();
+        }
+
+        public IEnumerable<AMove> Get_All_Legal_Moves_For(EColor player_color)
+        {
+            IEnumerable<AMove> move_candidates = Board.Get_Piece_Positions_For(player_color).SelectMany(pos =>
+            {
+                APiece piece = Board[pos];
+
+                return piece.Get_Moves(pos, Board);
+            });
+
+            return move_candidates.Where(move => move.Is_Legal(Board) );
+        }
+
+        public bool Is_Game_Over()
+        {
+            return Result != null;
         }
 
         public ABoard Board { get; }
+        public AsResult Result { get; private set; } = null;
         public EColor Current_Player_Color { get; private set; }
+
+        private void Check_For_Game_Over()
+        {
+            if (!Get_All_Legal_Moves_For(Current_Player_Color).Any() )
+            {
+                if (Board.Is_In_Check(Current_Player_Color) )
+                {
+                    Result = AsResult.Win(Current_Player_Color.Opponent() );
+                }
+                else
+                {
+                    Result = AsResult.Draw(EEnd_Reason.Stalemate);
+                }
+            }
+        }
     }
 }
