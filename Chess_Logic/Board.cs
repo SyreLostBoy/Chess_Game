@@ -50,7 +50,7 @@ namespace Chess_Logic
             Pieces[0, 3] = new AQueen(EColor.Black);
             Pieces[0, 4] = new AKing(EColor.Black);
             Pieces[0, 5] = new ABishop(EColor.Black);
-            Pieces[0, 6] = new AKing(EColor.Black);
+            Pieces[0, 6] = new AKnight(EColor.Black);
             Pieces[0, 7] = new ARook(EColor.Black);
 
             // 1.2 Белые фигуры

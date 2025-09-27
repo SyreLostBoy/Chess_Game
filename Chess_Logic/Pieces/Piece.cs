@@ -16,6 +16,30 @@ namespace Chess_Logic
         public abstract EPiece_Type Type { get; }
         public abstract EColor Color { get; }
         public bool Has_Moved { get; set; } = false;
+
+        public virtual bool Can_Capture_King(APosition from_pos, AsBoard board)
+        {
+            IEnumerable<AMove> moves = Get_Moves(from_pos, board);
+            APiece piece;
+
+            foreach (AMove move in moves)
+            {
+                piece = board[move.To_Position];
+
+                if (piece != null && piece.Type == EPiece_Type.King)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+
+            //return Get_Moves(from_pos, board).Any(move =>
+            //{
+            //    APiece piece = board[move.To_Position];
+            //    return piece != null && piece.Type == EPiece_Type.King;
+            //});
+        }
         protected IEnumerable<APosition> Get_Move_Positions_In_Direction(APosition from, AsBoard board, ADirection direction)
         {// Возвращает список позиций для хода в заданном направлении
 
@@ -45,5 +69,6 @@ namespace Chess_Logic
 
             return directions.SelectMany(direction => Get_Move_Positions_In_Direction(from, board, direction) );
         }
+
     }
 }

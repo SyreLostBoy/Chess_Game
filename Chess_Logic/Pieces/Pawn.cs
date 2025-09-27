@@ -86,7 +86,7 @@ namespace Chess_Logic
             }
         }
 
-        private static ADirection Forward_Direction;
+        private ADirection Forward_Direction;
 
     }
 }

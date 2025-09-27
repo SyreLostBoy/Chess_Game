@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Chess_Logic
 {
-    public class AsGame_State
+    public class AsGame_Engine
     {
-        public AsGame_State(EColor current_player_colro, AsBoard board)
+        public AsGame_Engine(EColor current_player_color, AsBoard board)
         {
-            Current_Player_Color = current_player_colro;
+            Current_Player_Color = current_player_color;
             Board = board;
         }
 
