@@ -13,7 +13,7 @@ namespace Chess_Logic
             From_Position = from_pos;
             To_Position = to_pos;
         }
-        public override void Act(AsBoard board)
+        public override void Act(ABoard board)
         {
             APiece piece = board[From_Position];
             

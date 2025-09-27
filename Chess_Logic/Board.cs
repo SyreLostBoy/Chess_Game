@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Chess_Logic
 {
-    public class AsBoard
+    public class ABoard
     {
-        public static AsBoard Get_Initial_Board()
+        public static ABoard Get_Initial_Board()
         {
-            AsBoard board = new AsBoard();
+            ABoard board = new ABoard();
 
             board.Add_Start_Pieces();
 
@@ -38,6 +38,64 @@ namespace Chess_Logic
         public bool Is_Empty(APosition pos)
         {
             return Pieces[pos.Row, pos.Column] == null;
+        }
+
+        public bool Is_In_Check(EColor player_color)
+        {
+            APiece piece;
+
+            foreach (APosition pos in Get_Piece_Positions_For(player_color.Opponent() ) )
+            {
+                piece = this[pos];
+
+                if (piece.Can_Capture_King(pos, this) )
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public IEnumerable<APosition> Get_Piece_Positions()
+        {
+            APosition pos;
+
+            for (int row = 0; row < 8; row++)
+            {
+                for (int col = 0; col < 8; col++)
+                {
+                    pos = new APosition(row, col);
+
+                    if (!Is_Empty(pos) )
+                    {
+                        yield return pos;  
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<APosition> Get_Piece_Positions_For(EColor color)
+        {
+            foreach(APosition pos in Get_Piece_Positions() )
+            {
+                if (this[pos].Color == color)
+                {
+                    yield return pos;
+                }
+            }
+        }
+
+        public ABoard Copy()
+        {
+            ABoard board_copy = new ABoard();
+
+            foreach (APosition pos in Get_Piece_Positions() )
+            {
+                board_copy[pos] = this[pos].Copy();
+            }
+
+            return board_copy;
         }
 
         private void Add_Start_Pieces()

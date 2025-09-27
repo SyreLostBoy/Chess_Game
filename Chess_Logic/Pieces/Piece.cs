@@ -12,17 +12,12 @@ namespace Chess_Logic
     public abstract class APiece
     {
         public abstract APiece Copy();
-        public abstract IEnumerable<AMove> Get_Moves(APosition from_pos, AsBoard board);
-        public abstract EPiece_Type Type { get; }
-        public abstract EColor Color { get; }
-        public bool Has_Moved { get; set; } = false;
-
-        public virtual bool Can_Capture_King(APosition from_pos, AsBoard board)
+        public abstract IEnumerable<AMove> Get_Moves(APosition from_pos, ABoard board);
+        public virtual bool Can_Capture_King(APosition from_pos, ABoard board)
         {
-            IEnumerable<AMove> moves = Get_Moves(from_pos, board);
             APiece piece;
 
-            foreach (AMove move in moves)
+            foreach (AMove move in Get_Moves(from_pos, board) )
             {
                 piece = board[move.To_Position];
 
@@ -40,12 +35,17 @@ namespace Chess_Logic
             //    return piece != null && piece.Type == EPiece_Type.King;
             //});
         }
-        protected IEnumerable<APosition> Get_Move_Positions_In_Direction(APosition from, AsBoard board, ADirection direction)
+
+        public abstract EPiece_Type Type { get; }
+        public abstract EColor Color { get; }
+        public bool Has_Moved { get; set; } = false;
+
+        protected IEnumerable<APosition> Get_Move_Positions_In_Direction(APosition from, ABoard board, ADirection direction)
         {// Возвращает список позиций для хода в заданном направлении
 
             APiece piece;
 
-            for (APosition pos = from + direction; AsBoard.Is_Inside_Board(pos); pos += direction)
+            for (APosition pos = from + direction; ABoard.Is_Inside_Board(pos); pos += direction)
             {
                 if (board.Is_Empty(pos) )
                 {
@@ -64,7 +64,7 @@ namespace Chess_Logic
             }
         }
         
-        protected IEnumerable<APosition> Get_Move_Positions_In_Directions(APosition from, AsBoard board, ADirection[] directions)
+        protected IEnumerable<APosition> Get_Move_Positions_In_Directions(APosition from, ABoard board, ADirection[] directions)
         {// Возвращает список всевозможных позиций для хода
 
             return directions.SelectMany(direction => Get_Move_Positions_In_Direction(from, board, direction) );

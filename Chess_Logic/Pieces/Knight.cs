@@ -17,7 +17,7 @@ namespace Chess_Logic
         {
             return new AKnight(Color, Has_Moved);
         }
-        public override IEnumerable<AMove> Get_Moves(APosition from_pos, AsBoard board)
+        public override IEnumerable<AMove> Get_Moves(APosition from_pos, ABoard board)
         {
             foreach (APosition to_pos in Get_Allowed_Move_Positions(from_pos, board))
             {
@@ -50,17 +50,17 @@ namespace Chess_Logic
             }
         }
 
-        private IEnumerable<APosition> Get_Allowed_Move_Positions(APosition from_pos, AsBoard board)
+        private IEnumerable<APosition> Get_Allowed_Move_Positions(APosition from_pos, ABoard board)
         {
             foreach(APosition to_pos in Get_Potential_To_Positions(from_pos) )
             {
-                if ( AsBoard.Is_Inside_Board(to_pos) && (board.Is_Empty(to_pos) || board[to_pos].Color != this.Color) )
+                if ( ABoard.Is_Inside_Board(to_pos) && (board.Is_Empty(to_pos) || board[to_pos].Color != this.Color) )
                 {
                     yield return to_pos;
                 }
             }
 
-            //return Get_Potential_To_Positions(from_pos).Where(pos => AsBoard.Is_Inside_Board(to_pos) && (board.Is_Empty(to_pos) || board[to_pos].Color != this.Color) );
+            //return Get_Potential_To_Positions(from_pos).Where(pos => ABoard.Is_Inside_Board(to_pos) && (board.Is_Empty(to_pos) || board[to_pos].Color != this.Color) );
         }
 
     }

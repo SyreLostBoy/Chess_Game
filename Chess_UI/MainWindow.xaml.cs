@@ -22,7 +22,7 @@ namespace Chess_UI
             InitializeComponent();
             Initialize_Board();
 
-            Game_Engine = new AsGame_Engine(EColor.White, AsBoard.Get_Initial_Board() );
+            Game_Engine = new AsGame_Engine(EColor.White, ABoard.Get_Initial_Board() );
             Draw_Board(Game_Engine.Board);
 
             Set_Cursor(Game_Engine.Current_Player_Color);
@@ -49,7 +49,7 @@ namespace Chess_UI
             }
         }
 
-        private void Draw_Board(AsBoard board)
+        private void Draw_Board(ABoard board)
         {
             APiece current_piece;
 

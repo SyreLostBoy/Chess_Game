@@ -26,29 +26,46 @@ namespace Chess_Logic
         {
             return new APawn(Color, Has_Moved);
         }
-        public override IEnumerable<AMove> Get_Moves(APosition from_pos, AsBoard board)
+        public override IEnumerable<AMove> Get_Moves(APosition from_pos, ABoard board)
         {
             return Get_Forward_Moves(from_pos, board).Concat(Get_Diagonal_Moves(from_pos, board));
+        }
+
+        public override bool Can_Capture_King(APosition from_pos, ABoard board)
+        {
+            APiece piece;
+
+            foreach (AMove move in Get_Diagonal_Moves(from_pos, board) )
+            {
+                piece = board[move.To_Position];
+
+                if (piece != null && piece.Type == EPiece_Type.King)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public override EPiece_Type Type => EPiece_Type.Pawn;
         public override EColor Color { get; }
         
 
-        private static bool Can_Move_To(APosition pos, AsBoard board)
+        private static bool Can_Move_To(APosition pos, ABoard board)
         {
-            return AsBoard.Is_Inside_Board(pos) && board.Is_Empty(pos);
+            return ABoard.Is_Inside_Board(pos) && board.Is_Empty(pos);
         }
-        private bool Can_Capture_At(APosition pos, AsBoard board)
+        private bool Can_Capture_At(APosition pos, ABoard board)
         {
-            if (!AsBoard.Is_Inside_Board(pos) || board.Is_Empty(pos) )
+            if (!ABoard.Is_Inside_Board(pos) || board.Is_Empty(pos) )
             {
                 return false;
             }
 
             return board[pos].Color != this.Color;
         }
-        private IEnumerable<AMove> Get_Forward_Moves(APosition from, AsBoard board)
+        private IEnumerable<AMove> Get_Forward_Moves(APosition from, ABoard board)
         {
             APosition one_move_pos = from + Forward_Direction;
             APosition two_move_pos;
@@ -65,7 +82,7 @@ namespace Chess_Logic
                 }
             }
         }
-        private IEnumerable<AMove> Get_Diagonal_Moves(APosition from_pos, AsBoard board)
+        private IEnumerable<AMove> Get_Diagonal_Moves(APosition from_pos, ABoard board)
         {
             APosition to_pos;
 

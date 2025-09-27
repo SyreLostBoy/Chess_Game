@@ -17,17 +17,34 @@ namespace Chess_Logic
         {
             return new AKing(Color, Has_Moved);
         }
-        public override IEnumerable<AMove> Get_Moves(APosition from_pos, AsBoard board)
+        public override IEnumerable<AMove> Get_Moves(APosition from_pos, ABoard board)
         {
             foreach (APosition to_pos in Get_Move_Positions(from_pos, board) )
             {
                 yield return new AMove_Normal(from_pos, to_pos);
             }
         }
+        public override bool Can_Capture_King(APosition from_pos, ABoard board)
+        {
+            APiece piece;
+
+            foreach (AMove move in Get_Moves(from_pos, board) )
+            {
+                piece = board[move.To_Position];
+
+                if (piece != null && piece.Type == EPiece_Type.King)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public override EPiece_Type Type => EPiece_Type.King;
         public override EColor Color { get; }
 
-        private IEnumerable<APosition> Get_Move_Positions(APosition from_pos, AsBoard board)
+        private IEnumerable<APosition> Get_Move_Positions(APosition from_pos, ABoard board)
         {
             APosition to_pos;
 
@@ -35,7 +52,7 @@ namespace Chess_Logic
             {
                 to_pos = from_pos + dir;
 
-                if (!AsBoard.Is_Inside_Board(to_pos))
+                if (!ABoard.Is_Inside_Board(to_pos))
                 {
                     continue;
                 }
