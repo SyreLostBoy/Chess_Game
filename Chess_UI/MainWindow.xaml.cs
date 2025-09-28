@@ -1,14 +1,14 @@
-﻿using System.Text;
+﻿using Chess_Logic;
+using System.Reflection.Emit;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Chess_Logic;
 
 namespace Chess_UI
 {
@@ -64,11 +64,19 @@ namespace Chess_UI
             }
         }
 
-        private void Board_Grid_Mouse_Down(object sender, MouseButtonEventArgs event_args)
+        private void On_Board_Grid_Mouse_Down(object sender, MouseButtonEventArgs event_args)
         {
-            Point point = event_args.GetPosition(Board_Grid);
-            APosition pos = To_Square_Position(point);
+            Point point;
+            APosition pos;
             
+            if (Is_Menu_On_Screen() )
+            {
+                return;
+            }
+
+            point = event_args.GetPosition(Board_Grid);
+            pos = To_Square_Position(point);
+
             if (Selected_Position == null)
             {
                 On_From_Position_Selected(pos);
@@ -99,10 +107,6 @@ namespace Chess_UI
                 Cache_Moves(moves);
                 Show_Highlights();
             }
-            else
-            {
-                int yy = 13;
-            }
         }
 
         private void On_To_Position_Selected(APosition pos)
@@ -121,6 +125,11 @@ namespace Chess_UI
             Game_Engine.Act_Move(move);
             Draw_Board(Game_Engine.Board);
             Set_Cursor(Game_Engine.Current_Player_Color);
+
+            if (Game_Engine.Is_Game_Over() )
+            {
+                Show_Game_Over();
+            }
         }
 
         private void Cache_Moves(IEnumerable<AMove> moves)
@@ -158,6 +167,40 @@ namespace Chess_UI
             {
                 Cursor = Chess_Cursors.Black_Cursor;
             }
+        }
+
+        private bool Is_Menu_On_Screen()
+        {
+            return Menu_Container.Content != null;
+        }
+
+        private void Show_Game_Over()
+        {
+            Game_Over_Menu game_over_menu = new Game_Over_Menu(Game_Engine.Result, Game_Engine.Current_Player_Color);
+            Menu_Container.Content = game_over_menu;
+
+            game_over_menu.Option_Selected += option =>
+            {
+                if (option == EOption.Restart)
+                {
+                    Menu_Container.Content = null;
+                    Restart_Game();
+                }
+                else
+                {
+                    Application.Current.Shutdown();
+                }
+            };
+        }
+
+        private void Restart_Game()
+        {
+            Hide_Highlights();
+            Move_Cache.Clear();
+            Game_Engine.Restart();
+            //Game_Engine = new AsGame_Engine(EColor.White, ABoard.Get_Initial_Board() );
+            Draw_Board(Game_Engine.Board);
+            Set_Cursor(Game_Engine.Current_Player_Color);
         }
 
         private AsGame_Engine Game_Engine;

@@ -57,8 +57,15 @@ namespace Chess_Logic
             return Result != null;
         }
 
-        public ABoard Board { get; }
-        public AsResult Result { get; private set; } = null;
+        public void Restart()
+        {
+            Board = ABoard.Get_Initial_Board();
+            Current_Player_Color = EColor.White;
+            Result = null;
+        }
+
+        public ABoard Board { get; private set; }
+        public AResult Result { get; private set; } = null;
         public EColor Current_Player_Color { get; private set; }
 
         private void Check_For_Game_Over()
@@ -67,11 +74,11 @@ namespace Chess_Logic
             {
                 if (Board.Is_In_Check(Current_Player_Color) )
                 {
-                    Result = AsResult.Win(Current_Player_Color.Opponent() );
+                    Result = AResult.Win(Current_Player_Color.Opponent() );
                 }
                 else
                 {
-                    Result = AsResult.Draw(EEnd_Reason.Stalemate);
+                    Result = AResult.Draw(EEnd_Reason.Stalemate);
                 }
             }
         }

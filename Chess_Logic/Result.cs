@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Chess_Logic
 {
-    public class AsResult
+    public class AResult
     {
-        AsResult(EColor winner_color, EEnd_Reason end_reason)
+        AResult(EColor winner_color, EEnd_Reason end_reason)
         {
             Winner = winner_color;
             End_Reason = end_reason;
@@ -17,14 +17,14 @@ namespace Chess_Logic
         public EColor Winner { get; }
         public EEnd_Reason End_Reason;
 
-        public static AsResult Win(EColor winner_color)
+        public static AResult Win(EColor winner_color)
         {
-            return new AsResult(winner_color, EEnd_Reason.Checkmate);
+            return new AResult(winner_color, EEnd_Reason.Checkmate);
         }
 
-        public static AsResult Draw(EEnd_Reason end_reason)
+        public static AResult Draw(EEnd_Reason end_reason)
         {
-            return new AsResult(EColor.None, end_reason);
+            return new AResult(EColor.None, end_reason);
         }
     }
 }
