@@ -36,7 +36,7 @@
 
             <Button Grid.Row="2"
                     x:Name="Restart_Button"
-                    Content="RESTART"
+                    Content="ЗАНОВО"
                     Style="{StaticResource Button_Style}"
                     Width="80"
                     Height="30"
@@ -45,7 +45,7 @@
             <Button Grid.Row="2"
                     Grid.Column="1"
                     x:Name="Exit_Button"
-                    Content="EXIT"
+                    Content="ВЫХОД"
                     Style="{StaticResource Button_Style}"
                     Width="80"
                     Height="30"

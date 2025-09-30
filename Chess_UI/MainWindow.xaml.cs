@@ -111,13 +111,43 @@ namespace Chess_UI
 
         private void On_To_Position_Selected(APosition pos)
         {
+            AMove move;
+
             Selected_Position = null;
             Hide_Highlights();
 
-            if (Move_Cache.TryGetValue(pos, out AMove move))
+            if (Move_Cache.TryGetValue(pos, out move) )
             {
-                Handle_Move(move);
+                if (move.Move_Type == EMove_Type.Pawn_Promotion)
+                {
+                    Handle_Promotion(move.From_Position, move.To_Position);
+                }
+                else
+                {
+                    Handle_Move(move);
+                }
             }
+        }
+
+        private void Handle_Promotion(APosition from_pos, APosition to_pos)
+        {
+            Promotion_Menu promotion_menu;
+            EColor current_player_color = Game_Engine.Current_Player_Color;
+
+            Piece_Images[to_pos.Row, to_pos.Column].Source = AsImages.Get_Image(current_player_color, EPiece_Type.Pawn);
+            Piece_Images[to_pos.Row, to_pos.Column].Source = null;
+
+            promotion_menu = new Promotion_Menu(current_player_color);
+            Menu_Container.Content = promotion_menu;
+
+            promotion_menu.Piece_Selected += piece_type =>
+            {
+                AMove promotion_move;
+
+                Menu_Container.Content = null;
+                promotion_move = new AMove_Pawn_Promotion(from_pos, to_pos, piece_type);
+                Handle_Move(promotion_move);
+            };
         }
 
         private void Handle_Move(AMove move)

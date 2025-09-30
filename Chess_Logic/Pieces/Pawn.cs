@@ -52,10 +52,6 @@ namespace Chess_Logic
         public override EColor Color { get; }
         
 
-        private static bool Can_Move_To(APosition pos, ABoard board)
-        {
-            return ABoard.Is_Inside_Board(pos) && board.Is_Empty(pos);
-        }
         private bool Can_Capture_At(APosition pos, ABoard board)
         {
             if (!ABoard.Is_Inside_Board(pos) || board.Is_Empty(pos) )
@@ -65,20 +61,31 @@ namespace Chess_Logic
 
             return board[pos].Color != this.Color;
         }
-        private IEnumerable<AMove> Get_Forward_Moves(APosition from, ABoard board)
+        private IEnumerable<AMove> Get_Forward_Moves(APosition from_pos, ABoard board)
         {
-            APosition one_move_pos = from + Forward_Direction;
+            APosition one_move_pos = from_pos + Forward_Direction;
             APosition two_move_pos;
 
             if (Can_Move_To(one_move_pos, board) )
             {
-                yield return new AMove_Normal(from, one_move_pos);
+                if (one_move_pos.Row == 0 || one_move_pos.Row == 7)
+                {// Ход превращения пешки
+                    foreach (AMove promotion_move in Get_Promotion_Moves(from_pos, one_move_pos))
+                    {
+                        yield return promotion_move;
+                    }
+                }
+                else
+                {
+                    yield return new AMove_Normal(from_pos, one_move_pos);
+
+                }
 
                 two_move_pos = one_move_pos + Forward_Direction;
 
                 if (!Has_Moved && Can_Move_To(two_move_pos, board) )
                 {
-                    yield return new AMove_Normal(from, two_move_pos);
+                    yield return new AMove_Normal(from_pos, two_move_pos);
                 }
             }
         }
@@ -94,13 +101,37 @@ namespace Chess_Logic
 
             foreach (ADirection dir in horizontal_directions)
             {
-                to_pos = from_pos + Forward_Direction + dir; // Forward_Direction + dir = диагональное направление относительно прямого движения пешки
+                to_pos = from_pos + Forward_Direction + dir; // Получаем диагональную позицию. Forward_Direction + dir = диагональное направление относительно прямого движения пешки
 
                 if (Can_Capture_At(to_pos, board) )
                 {
-                    yield return new AMove_Normal(from_pos, to_pos);
+                    if (to_pos.Row == 0 || to_pos.Row == 7)
+                    {// Ход превращения пешки
+                        foreach (AMove promotion_move in Get_Promotion_Moves(from_pos, to_pos))
+                        {
+                            yield return promotion_move;
+                        }
+                    }
+                    else
+                    {
+                        yield return new AMove_Normal(from_pos, to_pos);
+
+                    }
                 }
             }
+        }
+
+        private static bool Can_Move_To(APosition pos, ABoard board)
+        {
+            return ABoard.Is_Inside_Board(pos) && board.Is_Empty(pos);
+        }
+
+        private static IEnumerable<AMove> Get_Promotion_Moves(APosition from_pos, APosition to_pos)
+        {
+            yield return new AMove_Pawn_Promotion(from_pos, to_pos, EPiece_Type.Knight);
+            yield return new AMove_Pawn_Promotion(from_pos, to_pos, EPiece_Type.Bishop);
+            yield return new AMove_Pawn_Promotion(from_pos, to_pos, EPiece_Type.Rook);
+            yield return new AMove_Pawn_Promotion(from_pos, to_pos, EPiece_Type.Queen);
         }
 
         private ADirection Forward_Direction;
