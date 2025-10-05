@@ -23,6 +23,16 @@ namespace Chess_Logic
             {
                 yield return new AMove_Normal(from_pos, to_pos);
             }
+
+            if (Can_Castle_King_Side(from_pos, board) )
+            {
+                yield return new AMove_Castle(EMove_Type.Castle_KS, from_pos);
+            }
+
+            if (Can_Castle_Queen_Side(from_pos, board))
+            {
+                yield return new AMove_Castle(EMove_Type.Castle_QS, from_pos);
+            }
         }
         public override bool Can_Capture_King(APosition from_pos, ABoard board)
         {
@@ -43,6 +53,63 @@ namespace Chess_Logic
 
         public override EPiece_Type Type => EPiece_Type.King;
         public override EColor Color { get; }
+
+        public static bool Is_Unmoved_Rook(APosition pos, ABoard board)
+        {
+            APiece piece;
+
+            if (board.Is_Empty(pos))
+            {
+                return false;
+            }
+
+            piece = board[pos];
+
+            return piece.Type == EPiece_Type.Rook && !piece.Has_Moved;
+        }
+
+        public static bool All_Empty(IEnumerable<APosition> possitions, ABoard board)
+        {
+            return possitions.All(pos => board.Is_Empty(pos));
+        }
+
+        private bool Can_Castle_King_Side(APosition from, ABoard board)
+        {
+            int current_row;
+            APosition rook_pos;
+            APosition[] positions_between;
+
+            if (Has_Moved)
+            {
+                return false;
+            }
+
+            current_row = from.Row;
+
+            rook_pos = new APosition(current_row, 7);
+            positions_between = new APosition[] { new APosition(current_row, 5), new APosition(current_row, 6) };
+
+            return Is_Unmoved_Rook(rook_pos, board) && All_Empty(positions_between, board);
+        }
+
+        private bool Can_Castle_Queen_Side(APosition from, ABoard board)
+        {
+            int current_row;
+            APosition rook_pos;
+            APosition[] positions_between;
+
+            if (Has_Moved)
+            {
+                return false;
+            }
+
+            current_row = from.Row;
+
+            rook_pos = new APosition(current_row, 0);
+            positions_between = new APosition[] { new APosition(current_row, 1), new APosition(current_row, 2), new APosition(current_row, 3) };
+
+            return Is_Unmoved_Rook(rook_pos, board) && All_Empty(positions_between, board);
+        }
 
         private IEnumerable<APosition> Get_Move_Positions(APosition from_pos, ABoard board)
         {

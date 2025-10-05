@@ -14,7 +14,7 @@ namespace Chess_Logic
         {
             EColor player_color = board[From_Position].Color;
             ABoard board_copy = board.Copy();
-
+            
             Act(board_copy);
 
             return !board_copy.Is_In_Check(player_color);
