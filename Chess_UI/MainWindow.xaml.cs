@@ -20,6 +20,11 @@ namespace Chess_UI
         private AsGame_Engine Game_Engine;
         private APosition Selected_Position = null;
         private Color Highlight_Color = Color.FromArgb(150, 125, 255, 125);
+        private bool Is_Dragging = false;
+        private Point Drag_Start_Point;
+        private Image Dragged_Piece_Image, Dragged_Piece_Image_Clone;
+        private Canvas Drag_Canvas;
+        private APosition Drag_Start_Position;
 
         private readonly Image[,] Piece_Images = new Image[8, 8];
         private readonly Rectangle[,] Highlights = new Rectangle[8, 8];
@@ -29,6 +34,7 @@ namespace Chess_UI
         {
             InitializeComponent();
             Initialize_Board();
+            Initialize_Drag_Canvas();
 
             Game_Engine = new AsGame_Engine(EColor.White, ABoard.Get_Initial_Board() );
             Draw_Board(Game_Engine.Board);
@@ -57,6 +63,15 @@ namespace Chess_UI
             }
         }
 
+        private void Initialize_Drag_Canvas()
+        {
+            Drag_Canvas = new Canvas();
+
+            Drag_Canvas.IsHitTestVisible = false; // Чтобы не перехватывал события мыши
+
+            Board_Grid.Children.Add(Drag_Canvas);
+        }
+
         private void Draw_Board(ABoard board)
         {
             APiece current_piece;
@@ -72,39 +87,6 @@ namespace Chess_UI
             }
         }
 
-        private void On_Board_Grid_Mouse_Down(object sender, MouseButtonEventArgs event_args)
-        {
-            Point point;
-            APosition pos;
-            
-            if (Is_Menu_On_Screen() )
-            {
-                return;
-            }
-
-            point = event_args.GetPosition(Board_Grid);
-            pos = To_Square_Position(point);
-
-            if (Selected_Position == null)
-            {
-                On_From_Position_Selected(pos);
-            }
-            else
-            {
-                On_To_Position_Selected(pos);
-            }
-
-        }
-
-        private APosition To_Square_Position(Point point)
-        {
-            double square_size = Board_Grid.ActualWidth / 8;
-            int row = (int)(point.Y / square_size);
-            int col = (int)(point.X / square_size);
-
-            return new APosition(row, col);
-        }
-
         private void On_Window_Key_Down(object sender, KeyEventArgs event_args)
         {
             if (!Is_Menu_On_Screen() && event_args.Key == Key.Escape)
@@ -115,6 +97,140 @@ namespace Chess_UI
             {
                 Menu_Container.Content = null;
             }
+        }
+
+        private void On_Board_Grid_Mouse_Down(object sender, MouseButtonEventArgs event_args)
+        {
+            Point point;
+            APosition pos;
+            APiece piece;
+            
+            if (event_args.LeftButton != MouseButtonState.Pressed)
+            {
+                return;
+            }
+
+            if (Is_Menu_On_Screen() )
+            {
+                return;
+            }
+
+            point = event_args.GetPosition(Board_Grid);
+            pos = To_Square_Position(point);
+
+            piece = Game_Engine.Board[pos];
+
+            if (piece != null && piece.Color == Game_Engine.Current_Player_Color)
+            {
+                Start_Dragging(pos, point);
+            }
+
+        }
+        private void On_Board_Grid_Mouse_Move(object sender, MouseEventArgs event_args)
+        {
+            Point current_point;
+
+            if (Is_Dragging && event_args.LeftButton == MouseButtonState.Pressed)
+            {
+                current_point = event_args.GetPosition(Board_Grid);
+                Continue_Dragging(current_point);
+            }
+        }
+
+        private void On_Board_Grid_Mouse_Up(object sender, MouseButtonEventArgs event_args)
+        {
+            Point end_point;
+            APosition end_pos;
+
+            if (Is_Dragging)
+            {
+                end_point = event_args.GetPosition(Board_Grid);
+                end_pos = To_Square_Position(end_point);
+
+                End_Dragging(end_pos);
+            }
+        }
+
+        private void Start_Dragging(APosition pos, Point point)
+        {
+            Is_Dragging = true;
+            Drag_Start_Position = pos;
+            Drag_Start_Point = point;
+
+            Dragged_Piece_Image = Piece_Images[pos.Row, pos.Column];
+
+            if (Dragged_Piece_Image.Source == null)
+            {
+                return;
+            }
+
+            // Cоздаем визуальное представление для перетаскивания
+            Dragged_Piece_Image_Clone = new Image();
+            Dragged_Piece_Image_Clone.Source = Dragged_Piece_Image.Source;
+            Dragged_Piece_Image_Clone.Width = Dragged_Piece_Image.ActualWidth;
+            Dragged_Piece_Image_Clone.Height = Dragged_Piece_Image.ActualHeight;
+            Dragged_Piece_Image_Clone.Opacity = 1;
+
+            Dragged_Piece_Image.Opacity = 0.5;
+
+            // Устанавливаем позицию
+            Canvas.SetLeft(Dragged_Piece_Image_Clone, point.X - Dragged_Piece_Image_Clone.Width / 2);
+            Canvas.SetTop(Dragged_Piece_Image_Clone, point.Y - Dragged_Piece_Image_Clone.Height / 2);
+
+            Drag_Canvas.Children.Add(Dragged_Piece_Image_Clone);
+
+            On_From_Position_Selected(pos);
+
+            Board_Grid.CaptureMouse();
+        }
+
+        private void Continue_Dragging(Point current_point)
+        {
+            if (Dragged_Piece_Image_Clone == null)
+            {
+                return;
+            }
+
+            Canvas.SetLeft(Dragged_Piece_Image_Clone, current_point.X - Dragged_Piece_Image_Clone.Width / 2);
+            Canvas.SetTop(Dragged_Piece_Image_Clone, current_point.Y - Dragged_Piece_Image_Clone.Height / 2);
+
+        }
+
+        private void End_Dragging(APosition end_pos)
+        {
+            Is_Dragging = false;
+            Board_Grid.ReleaseMouseCapture();
+
+            if (Dragged_Piece_Image_Clone != null)
+            {
+                Drag_Canvas.Children.Remove(Dragged_Piece_Image_Clone);
+                Dragged_Piece_Image_Clone = null;
+            }
+
+            if (Dragged_Piece_Image != null)
+            {
+                Dragged_Piece_Image.Opacity = 1.0;
+
+                if (end_pos != null && end_pos != Drag_Start_Position)
+                {
+                    On_To_Position_Selected(end_pos);
+                }
+
+            }
+
+            Dragged_Piece_Image = null;
+            Selected_Position = null;
+            Hide_Highlights();
+            Move_Cache.Clear();
+        }
+
+        private APosition To_Square_Position(Point point)
+        {
+            double square_size = Board_Grid.ActualWidth / 8;
+            int row = (int)(point.Y / square_size);
+            int col = (int)(point.X / square_size);
+
+            return new APosition(row, col);
         }
 
         private void On_From_Position_Selected(APosition pos)

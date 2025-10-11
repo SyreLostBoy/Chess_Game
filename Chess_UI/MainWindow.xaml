@@ -14,7 +14,10 @@
         <Grid x:Name="Board_Grid" 
               Width="600" 
               Height="600"
-              MouseDown="On_Board_Grid_Mouse_Down">
+              MouseDown="On_Board_Grid_Mouse_Down"
+              MouseMove="On_Board_Grid_Mouse_Move"
+              MouseUp="On_Board_Grid_Mouse_Up">
+              
 
             <Grid.Background>
                 <ImageBrush ImageSource="/Assets/Board.png"></ImageBrush>
