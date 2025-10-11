@@ -105,6 +105,18 @@ namespace Chess_UI
             return new APosition(row, col);
         }
 
+        private void On_Window_Key_Down(object sender, KeyEventArgs event_args)
+        {
+            if (!Is_Menu_On_Screen() && event_args.Key == Key.Escape)
+            {
+                Show_Pause_Menu();
+            }
+            else if (!Game_Engine.Is_Game_Over() && event_args.Key == Key.Escape)
+            {
+                Menu_Container.Content = null;
+            }
+        }
+
         private void On_From_Position_Selected(APosition pos)
         {
             IEnumerable<AMove> moves = Game_Engine.Get_Legal_Moves_For_Piece(pos);
@@ -231,12 +243,29 @@ namespace Chess_UI
             };
         }
 
+        private void Show_Pause_Menu()
+        {
+            PauseMenu pause_menu = new PauseMenu();
+            Menu_Container.Content = pause_menu;
+
+            pause_menu.Option_Selected += option =>
+            {
+                Menu_Container.Content = null;
+
+                if (option == EOption.Restart)
+                { 
+                    Restart_Game();
+                }
+                // else - Menu_Container.Content = null;
+            };
+        }
+
         private void Restart_Game()
         {
+            Selected_Position = null;
             Hide_Highlights();
             Move_Cache.Clear();
             Game_Engine.Restart();
-            //Game_Engine = new AsGame_Engine(EColor.White, ABoard.Get_Initial_Board() );
             Draw_Board(Game_Engine.Board);
             Set_Cursor(Game_Engine.Current_Player_Color);
         }

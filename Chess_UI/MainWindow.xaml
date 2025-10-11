@@ -8,12 +8,14 @@
         Title="Шахматы" SizeToContent="Height" Width="600"
         Icon="/Assets/icon.ico"
         WindowStartupLocation ="CenterScreen"
-        Background="Black">
+        Background="Black"
+        KeyDown="On_Window_Key_Down">
     <Viewbox>
         <Grid x:Name="Board_Grid" 
               Width="600" 
               Height="600"
               MouseDown="On_Board_Grid_Mouse_Down">
+
             <Grid.Background>
                 <ImageBrush ImageSource="/Assets/Board.png"></ImageBrush>
             </Grid.Background>
