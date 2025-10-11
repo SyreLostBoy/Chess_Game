@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Chess_Logic
+﻿namespace Chess_Logic
 {
     public class APawn : APiece 
     {
@@ -12,6 +6,7 @@ namespace Chess_Logic
         public override EColor Color { get; }
 
         private ADirection Forward_Direction;
+
         public APawn(EColor color, bool has_moved = false)
         {
             Color = color;
@@ -53,6 +48,7 @@ namespace Chess_Logic
 
             return false;
         }
+
         private bool Can_Capture_At(APosition pos, ABoard board)
         {
             if (!ABoard.Is_Inside_Board(pos) || board.Is_Empty(pos) )
@@ -62,6 +58,7 @@ namespace Chess_Logic
 
             return board[pos].Color != this.Color;
         }
+
         private IEnumerable<AMove> Get_Forward_Moves(APosition from_pos, ABoard board)
         {
             APosition one_move_pos = from_pos + Forward_Direction;
@@ -86,10 +83,11 @@ namespace Chess_Logic
 
                 if (!Has_Moved && Can_Move_To(two_move_pos, board) )
                 {
-                    yield return new AMove_Normal(from_pos, two_move_pos);
+                    yield return new AMove_Double_Pawn(from_pos, two_move_pos);
                 }
             }
         }
+
         private IEnumerable<AMove> Get_Diagonal_Moves(APosition from_pos, ABoard board)
         {
             APosition to_pos;
@@ -104,7 +102,11 @@ namespace Chess_Logic
             {
                 to_pos = from_pos + Forward_Direction + dir; // Получаем диагональную позицию. Forward_Direction + dir = диагональное направление относительно прямого движения пешки
 
-                if (Can_Capture_At(to_pos, board) )
+                if (to_pos == board.Get_Pawn_Skip_Position(Color.Opponent() ) )
+                {
+                    yield return new AMove_En_Passant(from_pos, to_pos);
+                }
+                else if (Can_Capture_At(to_pos, board) )
                 {
                     if (to_pos.Row == 0 || to_pos.Row == 7)
                     {// Ход превращения пешки

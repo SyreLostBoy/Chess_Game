@@ -38,9 +38,9 @@ namespace Chess_Logic
 
         public void Act_Move(AMove move)
         {
+            Board.Set_Pawn_Skip_Position(Current_Player_Color, null);
             move.Act(Board);
             Current_Player_Color = Current_Player_Color.Opponent();
-
             Check_For_Game_Over();
         }
 

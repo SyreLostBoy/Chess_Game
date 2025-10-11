@@ -20,6 +20,7 @@ namespace Chess_Logic
             To_Position = to_pos;
             New_Piece_Type = new_piece_type;
         }
+
         public override void Act(ABoard board)
         {
             APiece pawn, promotion_piece; 

@@ -28,10 +28,12 @@ namespace Chess_Logic
             Color = color;
             Has_Moved = has_moved;
         }
+
         public override APiece Copy()
         {
             return new AQueen(Color, Has_Moved);
         }
+
         public override IEnumerable<AMove> Get_Moves(APosition from_pos, ABoard board)
         {
             foreach (APosition to_pos in Get_Move_Positions_In_Directions(from_pos, board, Directions) )

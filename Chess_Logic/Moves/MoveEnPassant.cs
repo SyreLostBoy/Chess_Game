@@ -6,26 +6,25 @@ using System.Threading.Tasks;
 
 namespace Chess_Logic
 {
-    public class AMove_Normal : AMove
+    public class AMove_En_Passant : AMove
     {
-        public override EMove_Type Move_Type => EMove_Type.Normal;
+        public override EMove_Type Move_Type => EMove_Type.En_Passant;
         public override APosition From_Position { get; }
         public override APosition To_Position { get; }
 
-        public AMove_Normal(APosition from_pos, APosition to_pos)
+        private readonly APosition Capture_Pos;
+
+        public AMove_En_Passant(APosition from_pos, APosition to_pos)
         {
             From_Position = from_pos;
             To_Position = to_pos;
+            Capture_Pos = new APosition(from_pos.Row, to_pos.Column);
         }
 
         public override void Act(ABoard board)
         {
-            APiece piece = board[From_Position];
-            
-            board[To_Position] = piece;
-            board[From_Position] = null;
-
-            piece.Has_Moved = true;
+            new AMove_Normal(From_Position, To_Position).Act(board);
+            board[Capture_Pos] = null;
         }
     }
 }

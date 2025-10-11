@@ -16,10 +16,12 @@ namespace Chess_Logic
             Color = color;
             Has_Moved = has_moved;
         }
+
         public override APiece Copy()
         {
             return new AKnight(Color, Has_Moved);
         }
+
         public override IEnumerable<AMove> Get_Moves(APosition from_pos, ABoard board)
         {
             foreach (APosition to_pos in Get_Allowed_Move_Positions(from_pos, board))
@@ -50,6 +52,7 @@ namespace Chess_Logic
                 }
             }
         }
+
         private IEnumerable<APosition> Get_Allowed_Move_Positions(APosition from_pos, ABoard board)
         {
             foreach(APosition to_pos in Get_Potential_To_Positions(from_pos) )

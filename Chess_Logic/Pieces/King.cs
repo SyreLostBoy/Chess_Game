@@ -28,10 +28,12 @@ namespace Chess_Logic
             Color = color;
             Has_Moved = has_moved;
         }
+
         public override APiece Copy()
         {
             return new AKing(Color, Has_Moved);
         }
+
         public override IEnumerable<AMove> Get_Moves(APosition from_pos, ABoard board)
         {
             foreach (APosition to_pos in Get_Move_Positions(from_pos, board) )
@@ -49,6 +51,7 @@ namespace Chess_Logic
                 yield return new AMove_Castle(EMove_Type.Castle_QS, from_pos);
             }
         }
+
         public override bool Can_Capture_King(APosition from_pos, ABoard board)
         {
             APiece piece;
@@ -65,6 +68,7 @@ namespace Chess_Logic
 
             return false;
         }
+
         public static bool Is_Unmoved_Rook(APosition pos, ABoard board)
         {
             APiece piece;

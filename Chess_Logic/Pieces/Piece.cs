@@ -18,6 +18,7 @@ namespace Chess_Logic
 
         public abstract APiece Copy();
         public abstract IEnumerable<AMove> Get_Moves(APosition from_pos, ABoard board);
+
         public virtual bool Can_Capture_King(APosition from_pos, ABoard board)
         {
             APiece piece;

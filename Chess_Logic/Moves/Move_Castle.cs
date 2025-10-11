@@ -38,6 +38,7 @@ namespace Chess_Logic
                 Rook_To_Pos = new APosition(king_row, 3);
             }
         }
+
         public override void Act(ABoard board)
         {
             new AMove_Normal(From_Position, To_Position).Act(board);
@@ -70,7 +71,7 @@ namespace Chess_Logic
             }
 
             return true;
-
         }
+
     }
 }
