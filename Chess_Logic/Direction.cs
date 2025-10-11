@@ -10,6 +10,21 @@ namespace Chess_Logic
 {
     public class ADirection
     {
+        // Basic Directions
+        public readonly static ADirection North = new ADirection(-1, 0);
+        public readonly static ADirection South = new ADirection(1, 0);
+        public readonly static ADirection East = new ADirection(0, 1);
+        public readonly static ADirection West = new ADirection(0, -1);
+
+        // Diagonal Directions
+        public readonly static ADirection North_East = North + East;
+        public readonly static ADirection North_West = North + West;
+        public readonly static ADirection South_East = South + East;
+        public readonly static ADirection South_West = South + West;
+
+        public int Row_Delta { get; }
+        public int Column_Delta { get; }
+
         public ADirection(int row_delta, int column_delta)
         {
             Row_Delta = row_delta;
@@ -28,21 +43,6 @@ namespace Chess_Logic
         {
             return new ADirection(dir.Row_Delta * scalar, dir.Column_Delta * scalar);
         }
-
-        public int Row_Delta { get; }
-        public int Column_Delta { get; }
-
-        // Basic Directions
-        public readonly static ADirection North = new ADirection(-1, 0);
-        public readonly static ADirection South = new ADirection(1, 0);
-        public readonly static ADirection East = new ADirection(0, 1);
-        public readonly static ADirection West = new ADirection(0, -1);
-
-        // Diagonal Directions
-        public readonly static ADirection North_East = North + East;
-        public readonly static ADirection North_West = North + West;
-        public readonly static ADirection South_East = South + East;
-        public readonly static ADirection South_West = South + West;
     }
 }
 //------------------------------------------------------------------------------------------------------------

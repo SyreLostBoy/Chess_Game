@@ -8,6 +8,12 @@ namespace Chess_Logic
 {
     public class AMove_Pawn_Promotion: AMove
     {
+        public override EMove_Type Move_Type => EMove_Type.Pawn_Promotion;
+        public override APosition From_Position { get; }
+        public override APosition To_Position { get; }
+
+        private readonly EPiece_Type New_Piece_Type;
+
         public AMove_Pawn_Promotion(APosition from_pos, APosition to_pos, EPiece_Type new_piece_type)
         {
             From_Position = from_pos;
@@ -26,10 +32,6 @@ namespace Chess_Logic
             board[To_Position] = promotion_piece;
         }
 
-        public override EMove_Type Move_Type => EMove_Type.Pawn_Promotion;
-        public override APosition From_Position { get; }
-        public override APosition To_Position { get; }
-
         private APiece Create_Promotion_Piece(EColor color)
         {
             switch (New_Piece_Type)
@@ -45,7 +47,5 @@ namespace Chess_Logic
                     return new AQueen(color, true);
             }
         }
-
-        private readonly EPiece_Type New_Piece_Type;
     }
 }

@@ -8,6 +8,14 @@ namespace Chess_Logic
 {
     public class AMove_Castle : AMove
     {
+        public override EMove_Type Move_Type { get; }
+        public override APosition From_Position { get; }
+        public override APosition To_Position { get; }
+
+        private readonly ADirection King_Move_Dir;
+        private readonly APosition Rook_From_Pos;
+        private readonly APosition Rook_To_Pos;
+
         public AMove_Castle(EMove_Type move_type, APosition king_pos)
         {
             int king_row = king_pos.Row;
@@ -64,13 +72,5 @@ namespace Chess_Logic
             return true;
 
         }
-
-        public override EMove_Type Move_Type { get; }
-        public override APosition From_Position { get; }
-        public override APosition To_Position { get; }
-
-        private readonly ADirection King_Move_Dir;
-        private readonly APosition Rook_From_Pos;
-        private readonly APosition Rook_To_Pos;
     }
 }

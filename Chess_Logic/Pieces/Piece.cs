@@ -11,6 +11,11 @@ namespace Chess_Logic
 {
     public abstract class APiece
     {
+        public bool Has_Moved { get; set; } = false;
+
+        public abstract EPiece_Type Type { get; }
+        public abstract EColor Color { get; }
+
         public abstract APiece Copy();
         public abstract IEnumerable<AMove> Get_Moves(APosition from_pos, ABoard board);
         public virtual bool Can_Capture_King(APosition from_pos, ABoard board)
@@ -35,10 +40,6 @@ namespace Chess_Logic
             //    return piece != null && piece.Type == EPiece_Type.King;
             //}); 
         }
-
-        public abstract EPiece_Type Type { get; }
-        public abstract EColor Color { get; }
-        public bool Has_Moved { get; set; } = false;
 
         protected IEnumerable<APosition> Get_Move_Positions_In_Direction(APosition from, ABoard board, ADirection direction)
         {// Возвращает список позиций для хода в заданном направлении

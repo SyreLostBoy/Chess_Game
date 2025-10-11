@@ -9,6 +9,13 @@ namespace Chess_Logic
 {
     public class ABoard
     {
+        private readonly APiece[,] Pieces = new APiece[8, 8];
+        private readonly Dictionary<EColor, APosition> Pawn_Skip_Positions = new Dictionary<EColor, APosition>
+        {
+            {EColor.White, null },
+            {EColor.Black, null }
+        };
+
         public static ABoard Get_Initial_Board()
         {
             ABoard board = new ABoard();
@@ -98,6 +105,16 @@ namespace Chess_Logic
             return board_copy;
         }
 
+        public APosition Get_Pawn_Skip_Position(EColor player_color)
+        {
+            return Pawn_Skip_Positions[player_color];
+        }
+
+        public void Set_Pawn_Skip_Position(EColor player_color, APosition position)
+        {
+            Pawn_Skip_Positions[player_color] = position;
+        }
+
         private void Add_Start_Pieces()
         {
             // 1. Задний ряд
@@ -128,7 +145,5 @@ namespace Chess_Logic
                 Pieces[6, i] = new APawn(EColor.White);
             }
         }
-
-        private readonly APiece[,] Pieces = new APiece[8, 8];
     }
 }

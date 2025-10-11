@@ -8,6 +8,9 @@ namespace Chess_Logic
 {
     public class AKnight: APiece
     {
+        public override EPiece_Type Type => EPiece_Type.Knight;
+        public override EColor Color { get; }
+
         public AKnight(EColor color, bool has_moved = false)
         {
             Color = color;
@@ -24,8 +27,6 @@ namespace Chess_Logic
                 yield return new AMove_Normal(from_pos, to_pos);
             }
         }
-        public override EPiece_Type Type => EPiece_Type.Knight;
-        public override EColor Color { get; }
 
         private static IEnumerable<APosition> Get_Potential_To_Positions(APosition from_pos)
         {
@@ -49,7 +50,6 @@ namespace Chess_Logic
                 }
             }
         }
-
         private IEnumerable<APosition> Get_Allowed_Move_Positions(APosition from_pos, ABoard board)
         {
             foreach(APosition to_pos in Get_Potential_To_Positions(from_pos) )

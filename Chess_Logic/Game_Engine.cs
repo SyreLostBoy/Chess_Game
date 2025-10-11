@@ -9,6 +9,10 @@ namespace Chess_Logic
 {
     public class AsGame_Engine
     {
+        public ABoard Board { get; private set; }
+        public AResult Result { get; private set; } = null;
+        public EColor Current_Player_Color { get; private set; }
+
         public AsGame_Engine(EColor current_player_color, ABoard board)
         {
             Current_Player_Color = current_player_color;
@@ -63,10 +67,6 @@ namespace Chess_Logic
             Current_Player_Color = EColor.White;
             Result = null;
         }
-
-        public ABoard Board { get; private set; }
-        public AResult Result { get; private set; } = null;
-        public EColor Current_Player_Color { get; private set; }
 
         private void Check_For_Game_Over()
         {

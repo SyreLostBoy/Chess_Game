@@ -10,6 +10,9 @@ namespace Chess_Logic
 {
     public class APosition
     {
+        public int Row { get; }
+        public int Column { get; }
+
         public APosition(int row, int column)
         {
             Row = row;
@@ -52,9 +55,6 @@ namespace Chess_Logic
         {
             return new APosition(pos.Row + dir.Row_Delta, pos.Column + dir.Column_Delta);
         }
-
-        public int Row { get; }
-        public int Column { get; }
     }
 }
 //------------------------------------------------------------------------------------------------------------

@@ -8,6 +8,21 @@ namespace Chess_Logic
 {
     public class AKing : APiece
     {
+        public override EPiece_Type Type => EPiece_Type.King;
+        public override EColor Color { get; }
+
+        private static readonly ADirection[] Directions = new ADirection[]
+        {
+           ADirection.North,
+           ADirection.East,
+           ADirection.West,
+           ADirection.South,
+           ADirection.North_West,
+           ADirection.North_East,
+           ADirection.South_West,
+           ADirection.South_East
+        };
+
         public AKing(EColor color, bool has_moved = false)
         {
             Color = color;
@@ -50,10 +65,6 @@ namespace Chess_Logic
 
             return false;
         }
-
-        public override EPiece_Type Type => EPiece_Type.King;
-        public override EColor Color { get; }
-
         public static bool Is_Unmoved_Rook(APosition pos, ABoard board)
         {
             APiece piece;
@@ -130,17 +141,5 @@ namespace Chess_Logic
                 }
             }
         }
-
-        private static readonly ADirection[] Directions = new ADirection[]
-        {
-           ADirection.North,
-           ADirection.East,
-           ADirection.West,
-           ADirection.South,
-           ADirection.North_West,
-           ADirection.North_East,
-           ADirection.South_West,
-           ADirection.South_East
-        };
     }
 }

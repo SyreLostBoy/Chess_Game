@@ -17,6 +17,14 @@ namespace Chess_UI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private AsGame_Engine Game_Engine;
+        private APosition Selected_Position = null;
+        private Color Highlight_Color = Color.FromArgb(150, 125, 255, 125);
+
+        private readonly Image[,] Piece_Images = new Image[8, 8];
+        private readonly Rectangle[,] Highlights = new Rectangle[8, 8];
+        private readonly Dictionary<APosition, AMove> Move_Cache = new Dictionary<APosition, AMove>();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -232,13 +240,5 @@ namespace Chess_UI
             Draw_Board(Game_Engine.Board);
             Set_Cursor(Game_Engine.Current_Player_Color);
         }
-
-        private AsGame_Engine Game_Engine;
-        private APosition Selected_Position = null;
-        private Color Highlight_Color = Color.FromArgb(150, 125, 255, 125);
-
-        private readonly Image[,] Piece_Images = new Image[8, 8];
-        private readonly Rectangle[,] Highlights = new Rectangle[8, 8];
-        private readonly Dictionary<APosition, AMove> Move_Cache = new Dictionary<APosition, AMove>();
     }
 }

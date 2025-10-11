@@ -8,6 +8,10 @@ namespace Chess_Logic
 {
     public abstract class AMove
     {
+        public abstract EMove_Type Move_Type { get; }
+        public abstract APosition From_Position { get; }
+        public abstract APosition To_Position { get; }
+
         public abstract void Act(ABoard board);
 
         public virtual bool Is_Legal(ABoard board)
@@ -19,10 +23,5 @@ namespace Chess_Logic
 
             return !board_copy.Is_In_Check(player_color);
         }
-
-        public abstract EMove_Type Move_Type { get;  }
-        public abstract APosition From_Position { get; }
-        public abstract APosition To_Position { get; }
-
     }
 }

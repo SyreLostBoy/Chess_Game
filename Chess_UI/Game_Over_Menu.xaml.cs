@@ -21,6 +21,8 @@ namespace Chess_UI
     /// </summary>
     public partial class Game_Over_Menu : UserControl
     {
+        public event Action<EOption> Option_Selected;
+
         public Game_Over_Menu(AResult result, EColor current_player)
         {
             InitializeComponent();
@@ -28,8 +30,6 @@ namespace Chess_UI
             Winner_Text.Text = Get_Winner_Text(result.Winner);
             Reason_Text.Text = Get_Reason_Text(result.End_Reason, current_player);
         }
-
-        public event Action<EOption> Option_Selected;
 
         private void On_Restart_Click(object sender, RoutedEventArgs event_args)
         {

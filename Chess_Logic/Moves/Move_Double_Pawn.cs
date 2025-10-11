@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_Logic
+namespace Chess_Logic.Moves
 {
-    public class AMove_Normal : AMove
+    public class Move_Double_Pawn : AMove
     {
-        public override EMove_Type Move_Type => EMove_Type.Normal;
+        public override EMove_Type Move_Type => EMove_Type.Double_Pawn_Move;
         public override APosition From_Position { get; }
         public override APosition To_Position { get; }
-        public AMove_Normal(APosition from_pos, APosition to_pos)
+        public Move_Double_Pawn(APosition from_pos, APosition to_pos)
         {
             From_Position = from_pos;
             To_Position = to_pos;
@@ -19,7 +19,7 @@ namespace Chess_Logic
         public override void Act(ABoard board)
         {
             APiece piece = board[From_Position];
-            
+
             board[To_Position] = piece;
             board[From_Position] = null;
 

@@ -8,6 +8,17 @@ namespace Chess_Logic
 {
     public class ARook : APiece
     {
+        public override EPiece_Type Type => EPiece_Type.Rook;
+        public override EColor Color { get; }
+
+        private static readonly ADirection[] Directions = new ADirection[]
+        {
+           ADirection.North,
+           ADirection.East,
+           ADirection.West,
+           ADirection.South
+        };
+
         public ARook(EColor color, bool has_moved = false)
         {
             Color = color;
@@ -24,17 +35,5 @@ namespace Chess_Logic
                 yield return new AMove_Normal(from_pos, to_pos);
             }
         }
-
-        public override EPiece_Type Type => EPiece_Type.Rook;
-        public override EColor Color { get; }
-       
-        private static readonly ADirection[] Directions = new ADirection[]
-        {
-           ADirection.North,
-           ADirection.East,
-           ADirection.West,
-           ADirection.South
-        };
-
     }
 }

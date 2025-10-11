@@ -8,6 +8,10 @@ namespace Chess_Logic
 {
     public class APawn : APiece 
     {
+        public override EPiece_Type Type => EPiece_Type.Pawn;
+        public override EColor Color { get; }
+
+        private ADirection Forward_Direction;
         public APawn(EColor color, bool has_moved = false)
         {
             Color = color;
@@ -22,10 +26,12 @@ namespace Chess_Logic
                 Forward_Direction = ADirection.South;
             }
         }
+
         public override APiece Copy()
         {
             return new APawn(Color, Has_Moved);
         }
+
         public override IEnumerable<AMove> Get_Moves(APosition from_pos, ABoard board)
         {
             return Get_Forward_Moves(from_pos, board).Concat(Get_Diagonal_Moves(from_pos, board));
@@ -47,11 +53,6 @@ namespace Chess_Logic
 
             return false;
         }
-
-        public override EPiece_Type Type => EPiece_Type.Pawn;
-        public override EColor Color { get; }
-        
-
         private bool Can_Capture_At(APosition pos, ABoard board)
         {
             if (!ABoard.Is_Inside_Board(pos) || board.Is_Empty(pos) )
@@ -133,8 +134,6 @@ namespace Chess_Logic
             yield return new AMove_Pawn_Promotion(from_pos, to_pos, EPiece_Type.Rook);
             yield return new AMove_Pawn_Promotion(from_pos, to_pos, EPiece_Type.Queen);
         }
-
-        private ADirection Forward_Direction;
 
     }
 }
