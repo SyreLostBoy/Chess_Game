@@ -59,9 +59,9 @@ namespace Chess_UI
             switch (winner_color)
             {
                 case EColor.White:
-                    return "БЕЛЫЙ";
+                    return "БЕЛЫЕ";
                 case EColor.Black:
-                    return "ЧЁРНЫЙ";
+                    return "ЧЁРНЫЕ";
                 case EColor.None:
                 default:
                     return "";
@@ -73,9 +73,9 @@ namespace Chess_UI
             switch (reason)
             {
                 case EEnd_Reason.Checkmate:
-                    return $"ШАХ И МАТ - {Get_Player_String(current_player)} НЕ ИМЕЕТ ХОДОВ";
+                    return $"ШАХ И МАТ \n {Get_Player_String(current_player)} НЕ ИМЕЮТ ХОДОВ";
                 case EEnd_Reason.Stalemate:
-                    return $"ПАТ - { Get_Player_String(current_player)} НЕ ИМЕЕТ ХОДОВ";
+                    return $"ПАТ \n { Get_Player_String(current_player)} НЕ ИМЕЮТ ХОДОВ";
                 case EEnd_Reason.Fifry_Move_Rule:
                     return "ПРАВИЛО 50 ХОДОВ";
                 case EEnd_Reason.Insufficient_Material:

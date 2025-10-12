@@ -19,7 +19,7 @@ namespace Chess_Logic
             Column = column;
         }
 
-        public EColor Square_Color() 
+        public EColor Get_Square_Color() 
         {
             if ((Row + Column) % 2 == 0)
             {
@@ -31,9 +31,7 @@ namespace Chess_Logic
 
         public override bool Equals(object obj)
         {
-            return obj is APosition position &&
-                   Row == position.Row &&
-                   Column == position.Column;
+            return obj is APosition position && Row == position.Row && Column == position.Column;
         }
 
         public override int GetHashCode()

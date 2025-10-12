@@ -122,7 +122,19 @@ namespace Chess_UI
 
             if (piece != null && piece.Color == Game_Engine.Current_Player_Color)
             {
+                if (Dragged_Piece_Image != null)
+                { // Выбрали новую фигуру, очищаем данные для старой
+                    Dragged_Piece_Image = null;
+                    Hide_Highlights();
+                    Move_Cache.Clear();
+                }
+
                 Start_Dragging(pos, point);
+            }
+
+            else if (Dragged_Piece_Image != null && Selected_Position != null)
+            {
+                On_To_Position_Selected(pos);
             }
 
         }
@@ -173,7 +185,7 @@ namespace Chess_UI
 
             Dragged_Piece_Image.Opacity = 0.5;
 
-            // Устанавливаем позицию
+            // Устанавливаем позицию взятой мышью фигуры
             Canvas.SetLeft(Dragged_Piece_Image_Clone, point.X - Dragged_Piece_Image_Clone.Width / 2);
             Canvas.SetTop(Dragged_Piece_Image_Clone, point.Y - Dragged_Piece_Image_Clone.Height / 2);
 
@@ -191,9 +203,9 @@ namespace Chess_UI
                 return;
             }
 
+            // Обновляем позицию взятой мышью фигуры
             Canvas.SetLeft(Dragged_Piece_Image_Clone, current_point.X - Dragged_Piece_Image_Clone.Width / 2);
             Canvas.SetTop(Dragged_Piece_Image_Clone, current_point.Y - Dragged_Piece_Image_Clone.Height / 2);
-
         }
 
         private void End_Dragging(APosition end_pos)
@@ -217,11 +229,6 @@ namespace Chess_UI
                 }
 
             }
-
-            Dragged_Piece_Image = null;
-            Selected_Position = null;
-            Hide_Highlights();
-            Move_Cache.Clear();
         }
 
         private APosition To_Square_Position(Point point)
@@ -249,20 +256,24 @@ namespace Chess_UI
         {
             AMove move;
 
-            Selected_Position = null;
-            Hide_Highlights();
-
-            if (Move_Cache.TryGetValue(pos, out move) )
+            if (! Move_Cache.TryGetValue(pos, out move) )
+            {// Недопустимый ход
+                return;
+            }    
+           
+            if (move.Move_Type == EMove_Type.Pawn_Promotion)
             {
-                if (move.Move_Type == EMove_Type.Pawn_Promotion)
-                {
-                    Handle_Promotion(move.From_Position, move.To_Position);
-                }
-                else
-                {
-                    Handle_Move(move);
-                }
+                Handle_Promotion(move.From_Position, move.To_Position);
             }
+            else
+            {
+                Handle_Move(move);
+            }
+
+            Selected_Position = null;
+            Dragged_Piece_Image = null;
+            Hide_Highlights();
+            Move_Cache.Clear();
         }
 
         private void Handle_Promotion(APosition from_pos, APosition to_pos)

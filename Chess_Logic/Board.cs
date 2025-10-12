@@ -105,6 +105,36 @@ namespace Chess_Logic
             return board_copy;
         }
 
+        public ACounting Count_Pieces()
+        {
+            APiece piece; 
+            ACounting counting = new ACounting();
+
+            foreach (APosition pos in Get_Piece_Positions() )
+            {
+                piece = this[pos];
+                counting.Increment(piece.Color, piece.Type);
+            }
+
+            return counting;
+        }
+
+        public bool Is_Insufficient_Material()
+        {
+            ACounting counting = Count_Pieces();
+
+            if (Is_King_Bishop_VS_King(counting) || Is_King_Bishop_VS_King_Bishop(counting) || 
+                Is_King_Knight_VS_King(counting) || Is_King_VS_King(counting) )
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
         public APosition Get_Pawn_Skip_Position(EColor player_color)
         {
             return Pawn_Skip_Positions[player_color];
@@ -143,6 +173,63 @@ namespace Chess_Logic
             {
                 Pieces[1, i] = new APawn(EColor.Black);
                 Pieces[6, i] = new APawn(EColor.White);
+            }
+        }
+
+        private APosition Find_First_Piece(EColor color, EPiece_Type piece_type)
+        {
+            return Get_Piece_Positions_For(color).First(pos => this[pos].Type == piece_type);
+        }
+
+        private static bool Is_King_VS_King(ACounting counting)
+        {
+            return counting.Total_Count == 2;
+        }
+
+        private static bool Is_King_Bishop_VS_King(ACounting counting)
+        {
+            if (counting.Total_Count == 3 && (counting.Get_White_Count(EPiece_Type.Bishop) == 1 || counting.Get_Black_Count(EPiece_Type.Bishop) == 1) )
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool Is_King_Knight_VS_King(ACounting counting)
+        {
+            if (counting.Total_Count == 3 && (counting.Get_White_Count(EPiece_Type.Knight) == 1 || counting.Get_Black_Count(EPiece_Type.Knight) == 1) )
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool Is_King_Bishop_VS_King_Bishop(ACounting counting)
+        {
+            APosition white_bishop_pos, black_bishop_pos;
+
+            if (counting.Total_Count != 4)
+            {
+                return false;
+            }
+
+            if (counting.Get_White_Count(EPiece_Type.Bishop) != 1 || counting.Get_Black_Count(EPiece_Type.Bishop) != 1)
+            {
+                return false;
+            }
+
+            white_bishop_pos = Find_First_Piece(EColor.White, EPiece_Type.Bishop);
+            black_bishop_pos = Find_First_Piece(EColor.Black, EPiece_Type.Bishop);
+
+            if (white_bishop_pos.Get_Square_Color() == black_bishop_pos.Get_Square_Color())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

@@ -6,13 +6,13 @@
              xmlns:local="clr-namespace:Chess_UI"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Border Width="275"
-            Height="125"
+    <Border Width="300"
+            Height="150"
             Style="{StaticResource Border_Style}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="0.5*"/>
+                <RowDefinition Height="1.5*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -31,6 +31,7 @@
                        Grid.ColumnSpan="2"
                        x:Name="Reason_Text"
                        Text="REASON TEXT"
+                       TextAlignment="Center"
                        Style="{StaticResource Text_Style}"
                        FontSize="16"/>
 

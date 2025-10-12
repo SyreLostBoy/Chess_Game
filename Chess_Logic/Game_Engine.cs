@@ -81,6 +81,10 @@ namespace Chess_Logic
                     Result = AResult.Draw(EEnd_Reason.Stalemate);
                 }
             }
+            else if (Board.Is_Insufficient_Material() )
+            {
+                Result = AResult.Draw(EEnd_Reason.Insufficient_Material);
+            }
         }
     }
 }
