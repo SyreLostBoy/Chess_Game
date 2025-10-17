@@ -18,14 +18,19 @@ namespace Chess_Logic
             To_Position = to_pos;
         }
 
-        public override void Act(ABoard board)
+        public override bool Act(ABoard board)
         {
+            bool captured;
             APiece piece = board[From_Position];
-            
+
+            captured = !board.Is_Empty(To_Position);
+
             board[To_Position] = piece;
             board[From_Position] = null;
 
             piece.Has_Moved = true;
+
+            return captured || piece.Type == EPiece_Type.Pawn;
         }
     }
 }

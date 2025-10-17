@@ -76,7 +76,7 @@ namespace Chess_UI
                     return $"ШАХ И МАТ \n {Get_Player_String(current_player)} НЕ ИМЕЮТ ХОДОВ";
                 case EEnd_Reason.Stalemate:
                     return $"ПАТ \n { Get_Player_String(current_player)} НЕ ИМЕЮТ ХОДОВ";
-                case EEnd_Reason.Fifry_Move_Rule:
+                case EEnd_Reason.Fifty_Move_Rule:
                     return "ПРАВИЛО 50 ХОДОВ";
                 case EEnd_Reason.Insufficient_Material:
                     return "МЁРТВАЯ ПОЗИЦИЯ (НЕДОСТАТОЧНО ФИГУР)";

@@ -39,10 +39,12 @@ namespace Chess_Logic
             }
         }
 
-        public override void Act(ABoard board)
+        public override bool Act(ABoard board)
         {
             new AMove_Normal(From_Position, To_Position).Act(board);
             new AMove_Normal(Rook_From_Pos, Rook_To_Pos).Act(board);
+
+            return false;
         }
 
         public override bool Is_Legal(ABoard board)

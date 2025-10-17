@@ -13,10 +13,13 @@ namespace Chess_Logic
         public AResult Result { get; private set; } = null;
         public EColor Current_Player_Color { get; private set; }
 
+        private int No_Capture_Or_Pawn_Moves;
+
         public AsGame_Engine(EColor current_player_color, ABoard board)
         {
             Current_Player_Color = current_player_color;
             Board = board;
+            No_Capture_Or_Pawn_Moves = 0;
         }
 
         public IEnumerable<AMove> Get_Legal_Moves_For_Piece(APosition pos)
@@ -39,7 +42,16 @@ namespace Chess_Logic
         public void Act_Move(AMove move)
         {
             Board.Set_Pawn_Skip_Position(Current_Player_Color, null);
-            move.Act(Board);
+            
+            if (move.Act(Board) )
+            {// Capture or pawn move
+                No_Capture_Or_Pawn_Moves = 0;
+            }
+            else
+            {
+                No_Capture_Or_Pawn_Moves++;
+            }
+            
             Current_Player_Color = Current_Player_Color.Opponent();
             Check_For_Game_Over();
         }
@@ -66,6 +78,7 @@ namespace Chess_Logic
             Board = ABoard.Get_Initial_Board();
             Current_Player_Color = EColor.White;
             Result = null;
+            No_Capture_Or_Pawn_Moves = 0;
         }
 
         private void Check_For_Game_Over()
@@ -84,6 +97,24 @@ namespace Chess_Logic
             else if (Board.Is_Insufficient_Material() )
             {
                 Result = AResult.Draw(EEnd_Reason.Insufficient_Material);
+            }
+            else if (Fifty_Move_Rule() )
+            {
+                Result = AResult.Draw(EEnd_Reason.Fifty_Move_Rule);
+            }
+        }
+
+        private bool Fifty_Move_Rule()
+        {
+            int full_moves = No_Capture_Or_Pawn_Moves / 2;
+
+            if (full_moves == 50)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

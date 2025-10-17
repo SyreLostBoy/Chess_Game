@@ -21,7 +21,7 @@ namespace Chess_Logic
             New_Piece_Type = new_piece_type;
         }
 
-        public override void Act(ABoard board)
+        public override bool Act(ABoard board)
         {
             APiece pawn, promotion_piece; 
             pawn = board[From_Position];
@@ -31,6 +31,8 @@ namespace Chess_Logic
             promotion_piece = Create_Promotion_Piece(pawn.Color);
 
             board[To_Position] = promotion_piece;
+
+            return true;
         }
 
         private APiece Create_Promotion_Piece(EColor color)

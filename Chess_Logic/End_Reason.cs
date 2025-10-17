@@ -10,7 +10,7 @@ namespace Chess_Logic
     {
         Checkmate,
         Stalemate,
-        Fifry_Move_Rule,
+        Fifty_Move_Rule,
         Insufficient_Material,
         Threefold_Repetition
     }

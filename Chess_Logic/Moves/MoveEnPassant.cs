@@ -21,10 +21,12 @@ namespace Chess_Logic
             Capture_Pos = new APosition(from_pos.Row, to_pos.Column);
         }
 
-        public override void Act(ABoard board)
+        public override bool Act(ABoard board)
         {
             new AMove_Normal(From_Position, To_Position).Act(board);
             board[Capture_Pos] = null;
+
+            return true;
         }
     }
 }

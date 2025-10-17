@@ -12,7 +12,7 @@ namespace Chess_Logic
         public abstract APosition From_Position { get; }
         public abstract APosition To_Position { get; }
 
-        public abstract void Act(ABoard board);
+        public abstract bool Act(ABoard board); // True if piece captured or pawn moved
 
         public virtual bool Is_Legal(ABoard board)
         {

@@ -15,13 +15,15 @@
             Skipped_Position = new APosition( (from_pos.Row + to_pos.Row) / 2, from_pos.Column);
         }
 
-        public override void Act(ABoard board)
+        public override bool Act(ABoard board)
         {
             EColor player_color = board[From_Position].Color;
 
             board.Set_Pawn_Skip_Position(player_color, Skipped_Position);
 
             new AMove_Normal(From_Position, To_Position).Act(board);
+
+            return true;
         }
     }
 }
