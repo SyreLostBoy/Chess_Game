@@ -119,7 +119,7 @@ namespace Chess_Logic
             return counting;
         }
 
-        public bool Is_Insufficient_Material()
+        public bool Check_Insufficient_Material()
         {
             ACounting counting = Count_Pieces();
 
@@ -143,6 +143,94 @@ namespace Chess_Logic
         public void Set_Pawn_Skip_Position(EColor player_color, APosition position)
         {
             Pawn_Skip_Positions[player_color] = position;
+        }
+
+        public bool Has_Castle_Right_KS(EColor player_color)
+        {
+            switch (player_color)
+            {
+                case EColor.Black:
+                    return Is_Unmoved_King_And_Rook(new APosition(7, 4), new APosition(7, 7));
+
+                case EColor.White:
+                    return Is_Unmoved_King_And_Rook(new APosition(0, 4), new APosition(0, 7));
+
+                default:
+                    return false;
+            }
+        }
+
+        public bool Has_Castle_Right_QS(EColor player_color)
+        {
+            switch (player_color)
+            {
+                case EColor.Black:
+                    return Is_Unmoved_King_And_Rook(new APosition(7, 4), new APosition(0, 0));
+
+                case EColor.White:
+                    return Is_Unmoved_King_And_Rook(new APosition(0, 4), new APosition(7, 0));
+
+                default:
+                    return false;
+            }
+        }
+
+        public bool Can_Capture_En_Passant(EColor player_color)
+        {
+            APosition[] pawn_positions;
+            APosition skip_position = Get_Pawn_Skip_Position(player_color.Opponent());
+
+            if (skip_position == null)
+            {// opponent didn't move two squares
+                return false;
+            }
+
+            switch (player_color)
+            {
+                case EColor.Black:
+                    pawn_positions = new APosition[] { skip_position + ADirection.North_West, skip_position + ADirection.North_East };
+                    break;
+
+                case EColor.White:
+                    pawn_positions = new APosition[] { skip_position + ADirection.South_West, skip_position + ADirection.South_East };
+                    break;
+
+                default:
+                    pawn_positions = Array.Empty<APosition>();
+                    break;
+            }
+
+            return Has_Pawn_In_Position(player_color, pawn_positions, skip_position);
+        }
+
+        private bool Has_Pawn_In_Position(EColor player_color, APosition[] pawn_positions, APosition skip_pos)
+        {
+            APiece piece;
+            AMove_En_Passant en_passant_move;
+
+            foreach (APosition pos in pawn_positions)
+            {
+                if (!Is_Inside_Board(pos) )
+                {
+                    continue;
+                }
+
+                piece = this[pos];
+                
+                if (piece == null || piece.Color != player_color || piece.Type != EPiece_Type.Pawn)
+                {
+                    continue;
+                }
+
+                en_passant_move = new AMove_En_Passant(pos, skip_pos);
+
+                if (en_passant_move.Is_Legal(this) )
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void Add_Start_Pieces()
@@ -181,24 +269,20 @@ namespace Chess_Logic
             return Get_Piece_Positions_For(color).First(pos => this[pos].Type == piece_type);
         }
 
-        private static bool Is_King_VS_King(ACounting counting)
+        private bool Is_Unmoved_King_And_Rook(APosition king_pos, APosition rook_pos)
         {
-            return counting.Total_Count == 2;
-        }
+            APiece king, rook;
 
-        private static bool Is_King_Bishop_VS_King(ACounting counting)
-        {
-            if (counting.Total_Count == 3 && (counting.Get_White_Count(EPiece_Type.Bishop) == 1 || counting.Get_Black_Count(EPiece_Type.Bishop) == 1) )
+            if (Is_Empty(king_pos) || Is_Empty(rook_pos) )
             {
-                return true;
+                return false;
             }
 
-            return false;
-        }
+            king = this[king_pos];
+            rook = this[king_pos];
 
-        private static bool Is_King_Knight_VS_King(ACounting counting)
-        {
-            if (counting.Total_Count == 3 && (counting.Get_White_Count(EPiece_Type.Knight) == 1 || counting.Get_Black_Count(EPiece_Type.Knight) == 1) )
+            if (king.Type == EPiece_Type.King && rook.Type == EPiece_Type.Rook &&
+                king.Has_Moved == false && rook.Has_Moved == false)
             {
                 return true;
             }
@@ -231,6 +315,31 @@ namespace Chess_Logic
             {
                 return false;
             }
+        }
+
+        private static bool Is_King_VS_King(ACounting counting)
+        {
+            return counting.Total_Count == 2;
+        }
+
+        private static bool Is_King_Bishop_VS_King(ACounting counting)
+        {
+            if (counting.Total_Count == 3 && (counting.Get_White_Count(EPiece_Type.Bishop) == 1 || counting.Get_Black_Count(EPiece_Type.Bishop) == 1) )
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool Is_King_Knight_VS_King(ACounting counting)
+        {
+            if (counting.Total_Count == 3 && (counting.Get_White_Count(EPiece_Type.Knight) == 1 || counting.Get_Black_Count(EPiece_Type.Knight) == 1) )
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

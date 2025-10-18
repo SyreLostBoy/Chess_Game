@@ -19,7 +19,7 @@ namespace Chess_Logic
         }
 
         public override bool Act(ABoard board)
-        {
+        {// Returns true if piece captured or pawn moved
             bool captured;
             APiece piece = board[From_Position];
 

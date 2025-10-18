@@ -14,12 +14,19 @@ namespace Chess_Logic
         public EColor Current_Player_Color { get; private set; }
 
         private int No_Capture_Or_Pawn_Moves;
+        private string State_String;
+
+        private readonly Dictionary<string, int> State_History = new Dictionary<string, int>();
 
         public AsGame_Engine(EColor current_player_color, ABoard board)
         {
             Current_Player_Color = current_player_color;
             Board = board;
             No_Capture_Or_Pawn_Moves = 0;
+
+            State_String = new AState_String(Board, Current_Player_Color).ToString();
+            
+            State_History[State_String] = 1;
         }
 
         public IEnumerable<AMove> Get_Legal_Moves_For_Piece(APosition pos)
@@ -42,17 +49,20 @@ namespace Chess_Logic
         public void Act_Move(AMove move)
         {
             Board.Set_Pawn_Skip_Position(Current_Player_Color, null);
-            
+
             if (move.Act(Board) )
             {// Capture or pawn move
                 No_Capture_Or_Pawn_Moves = 0;
+                State_History.Clear();
             }
             else
             {
                 No_Capture_Or_Pawn_Moves++;
             }
-            
+
             Current_Player_Color = Current_Player_Color.Opponent();
+            
+            Update_State_String();
             Check_For_Game_Over();
         }
 
@@ -79,6 +89,24 @@ namespace Chess_Logic
             Current_Player_Color = EColor.White;
             Result = null;
             No_Capture_Or_Pawn_Moves = 0;
+
+            State_History.Clear();
+            State_String = new AState_String(Board, Current_Player_Color).ToString();
+            State_History[State_String] = 1;
+        }
+
+        private void Update_State_String()
+        {
+            State_String = new AState_String(Board, Current_Player_Color).ToString();
+
+            if (!State_History.ContainsKey(State_String) )
+            {
+                State_History[State_String] = 1;
+            }
+            else
+            {
+                State_History[State_String]++;
+            }
         }
 
         private void Check_For_Game_Over()
@@ -94,17 +122,21 @@ namespace Chess_Logic
                     Result = AResult.Draw(EEnd_Reason.Stalemate);
                 }
             }
-            else if (Board.Is_Insufficient_Material() )
+            else if (Board.Check_Insufficient_Material() )
             {
                 Result = AResult.Draw(EEnd_Reason.Insufficient_Material);
             }
-            else if (Fifty_Move_Rule() )
+            else if (Check_Fifty_Move_Rule() )
             {
                 Result = AResult.Draw(EEnd_Reason.Fifty_Move_Rule);
             }
+            else if (Check_Threefold_Repetition() )
+            {
+                Result = AResult.Draw(EEnd_Reason.Threefold_Repetition);
+            }
         }
 
-        private bool Fifty_Move_Rule()
+        private bool Check_Fifty_Move_Rule()
         {
             int full_moves = No_Capture_Or_Pawn_Moves / 2;
 
@@ -116,6 +148,11 @@ namespace Chess_Logic
             {
                 return false;
             }
+        }
+
+        private bool Check_Threefold_Repetition()
+        {
+            return State_History[State_String] == 3;
         }
     }
 }
