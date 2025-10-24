@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -19,12 +20,18 @@ namespace Chess_Logic
         };
 
         public static ABoard Get_Initial_Board()
-        {
+        {// Legacy
+
             ABoard board = new ABoard();
 
             board.Add_Start_Pieces();
 
             return board;
+        }
+
+        public static ABoard Get_Board_From_Fen(string fen)
+        {
+            return AsFen_Parser.Parse_Board_From_FEN(fen);
         }
 
         public APiece this[int row, int col]
@@ -147,6 +154,41 @@ namespace Chess_Logic
             Pawn_Skip_Positions[player_color] = position;
         }
 
+        public void Reset_Castling_Flags()
+        {
+            APiece piece;
+
+            foreach(APosition pos in Get_Piece_Positions() )
+            {
+                piece = this[pos];
+
+                if (piece.Type == EPiece_Type.King || piece.Type == EPiece_Type.Rook)
+                {
+                    piece.Has_Moved = true;
+                }
+            }
+        }
+
+        public void Set_Castling_Right_For(EColor player_color, bool is_king_side)
+        {
+            int row = player_color == EColor.White ? 0 : 7;
+            int king_col = 4;
+            int rook_col = is_king_side ? 7 : 0;
+
+            APiece king_piece = this[row, king_col];
+            APiece rook_piece = this[row, rook_col];
+
+            if (king_piece.Type == EPiece_Type.King && king_piece.Color == player_color)
+            {
+                king_piece.Has_Moved = false;
+            }
+
+            if (rook_piece.Type == EPiece_Type.Rook && rook_piece.Color == player_color)
+            {
+                rook_piece.Has_Moved = false;
+            }
+        }
+
         public bool Has_Castle_Right_KS(EColor player_color)
         {
             switch (player_color)
@@ -236,7 +278,8 @@ namespace Chess_Logic
         }
 
         private void Add_Start_Pieces()
-        {
+        {// Legacy
+
             // 1. Задний ряд
             // 1.1 Черные фигуры
             Pieces[0, 0] = new ARook(EColor.Black);

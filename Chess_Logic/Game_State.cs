@@ -7,6 +7,8 @@ namespace Chess_Logic
         public AResult Result { get; private set; } = null;
         public EColor Current_Player_Color { get; private set; }
 
+        public static readonly string Start_Game_State_String = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq —";
+
         private int No_Capture_Or_Pawn_Moves;
         private string State_String;
 
@@ -18,7 +20,7 @@ namespace Chess_Logic
             Board = board;
             No_Capture_Or_Pawn_Moves = 0;
 
-            State_String = new AState_String(Board, Current_Player_Color).ToString();
+            State_String = AsFEN_Generator.Generate_State_String(Board, Current_Player_Color);
             
             State_History[State_String] = 1;
         }
@@ -94,19 +96,19 @@ namespace Chess_Logic
 
         public void Restart()
         {
-            Board = ABoard.Get_Initial_Board();
+            Board = ABoard.Get_Board_From_Fen(Start_Game_State_String);
             Current_Player_Color = EColor.White;
             Result = null;
             No_Capture_Or_Pawn_Moves = 0;
 
             State_History.Clear();
-            State_String = new AState_String(Board, Current_Player_Color).ToString();
+            State_String = AsFEN_Generator.Generate_State_String(Board, Current_Player_Color);
             State_History[State_String] = 1;
         }
 
         private void Update_State_String()
         {
-            State_String = new AState_String(Board, Current_Player_Color).ToString();
+            State_String = AsFEN_Generator.Generate_State_String(Board, Current_Player_Color);
 
             if (!State_History.ContainsKey(State_String) )
             {

@@ -40,7 +40,7 @@ namespace Chess_UI
             Initialize_Board();
             Initialize_Drag_Canvas();
 
-            Game_State = new AsGame_State(EColor.White, ABoard.Get_Initial_Board() );
+            Game_State = AsFen_Parser.Parse_Game_State_From_FEN(AsGame_State.Start_Game_State_String);
             Sound_System = new AsSound_System();
 
             Draw_Board(Game_State.Board);
