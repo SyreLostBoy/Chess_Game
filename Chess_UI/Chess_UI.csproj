@@ -12,6 +12,8 @@
     <None Remove="Assets\BishopB.png" />
     <None Remove="Assets\BishopW.png" />
     <None Remove="Assets\Board.png" />
+	<None Remove="Assets\BoardBlue.png" />
+	<None Remove="Assets\BoardBrown.png" />
     <None Remove="Assets\CursorB.cur" />
     <None Remove="Assets\CursorW.cur" />
     <None Remove="Assets\icon.ico" />
@@ -32,9 +34,18 @@
   </ItemGroup>
 
   <ItemGroup>
+	<!-- Копировать папку Assets/Audio в выходную директорию -->
+	<Content Include="Assets\Audio\**">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Assets\BishopB.png" />
     <Resource Include="Assets\BishopW.png" />
     <Resource Include="Assets\Board.png" />
+	<Resource Include="Assets\BoardBlue.png" />
+	<Resource Include="Assets\BoardBrown.png" />
     <Resource Include="Assets\CursorB.cur" />
     <Resource Include="Assets\CursorW.cur" />
     <Resource Include="Assets\icon.ico" />

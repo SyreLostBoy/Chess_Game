@@ -19,7 +19,7 @@ namespace Chess_Logic
         public abstract APiece Copy();
         public abstract IEnumerable<AMove> Get_Moves(APosition from_pos, ABoard board);
 
-        public virtual bool Can_Capture_King(APosition from_pos, ABoard board)
+        public virtual bool Can_Capture_King(APosition from_pos, ABoard board, ref APosition king_pos)
         {
             APiece piece;
 
@@ -29,17 +29,13 @@ namespace Chess_Logic
 
                 if (piece != null && piece.Type == EPiece_Type.King)
                 {
+                    king_pos = move.To_Position;
                     return true;
                 }
             }
 
+            king_pos = null;
             return false;
-
-            //return Get_Moves(from_pos, board).Any(move =>
-            //{
-            //    APiece piece = board[move.To_Position];
-            //    return piece != null && piece.Type == EPiece_Type.King;
-            //}); 
         }
 
         protected IEnumerable<APosition> Get_Move_Positions_In_Direction(APosition from, ABoard board, ADirection direction)

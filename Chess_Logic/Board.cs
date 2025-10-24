@@ -9,6 +9,8 @@ namespace Chess_Logic
 {
     public class ABoard
     {
+        public APosition Check_King_Position;
+
         private readonly APiece[,] Pieces = new APiece[8, 8];
         private readonly Dictionary<EColor, APosition> Pawn_Skip_Positions = new Dictionary<EColor, APosition>
         {
@@ -55,7 +57,7 @@ namespace Chess_Logic
             {
                 piece = this[pos];
 
-                if (piece.Can_Capture_King(pos, this) )
+                if (piece.Can_Capture_King(pos, this, ref Check_King_Position) )
                 {
                     return true;
                 }

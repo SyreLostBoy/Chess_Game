@@ -1,4 +1,5 @@
 ﻿using Chess_Logic;
+using Sound_System;
 using System.Reflection.Emit;
 using System.Text;
 using System.Windows;
@@ -17,9 +18,12 @@ namespace Chess_UI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private AsGame_Engine Game_Engine;
+        private AsGame_State Game_State;
+        private AsSound_System Sound_System;
         private APosition Selected_Position = null;
+        private APosition Check_King_Pos;
         private Color Highlight_Color = Color.FromArgb(150, 125, 255, 125);
+        private Color Check_Highlight = Color.FromArgb(150, 255, 0, 0);
         private bool Is_Dragging = false;
         private Point Drag_Start_Point;
         private Image Dragged_Piece_Image, Dragged_Piece_Image_Clone;
@@ -36,10 +40,12 @@ namespace Chess_UI
             Initialize_Board();
             Initialize_Drag_Canvas();
 
-            Game_Engine = new AsGame_Engine(EColor.White, ABoard.Get_Initial_Board() );
-            Draw_Board(Game_Engine.Board);
+            Game_State = new AsGame_State(EColor.White, ABoard.Get_Initial_Board() );
+            Sound_System = new AsSound_System();
 
-            Set_Cursor(Game_Engine.Current_Player_Color);
+            Draw_Board(Game_State.Board);
+
+            Set_Cursor(Game_State.Current_Player_Color);
         }
 
         private void Initialize_Board()
@@ -75,6 +81,7 @@ namespace Chess_UI
         private void Draw_Board(ABoard board)
         {
             APiece current_piece;
+            APosition king_pos;
 
             for (int row = 0; row < 8; row++)
             {
@@ -85,6 +92,19 @@ namespace Chess_UI
                     Piece_Images[row, col].Source = AsImages.Get_Image(current_piece);
                 }
             }
+
+            king_pos = Game_State.Get_Check_King_Position();
+
+            if (king_pos != null)
+            {
+                Check_King_Pos = king_pos;
+
+                Show_Check_King_Position();
+            }
+            else
+            {
+                Hide_Check_King_Position();
+            }
         }
 
         private void On_Window_Key_Down(object sender, KeyEventArgs event_args)
@@ -93,7 +113,7 @@ namespace Chess_UI
             {
                 Show_Pause_Menu();
             }
-            else if (!Game_Engine.Is_Game_Over() && event_args.Key == Key.Escape)
+            else if (!Game_State.Is_Game_Over() && event_args.Key == Key.Escape)
             {
                 Menu_Container.Content = null;
             }
@@ -118,9 +138,9 @@ namespace Chess_UI
             point = event_args.GetPosition(Board_Grid);
             pos = To_Square_Position(point);
 
-            piece = Game_Engine.Board[pos];
+            piece = Game_State.Board[pos];
 
-            if (piece != null && piece.Color == Game_Engine.Current_Player_Color)
+            if (piece != null && piece.Color == Game_State.Current_Player_Color)
             {
                 if (Dragged_Piece_Image != null)
                 { // Выбрали новую фигуру, очищаем данные для старой
@@ -242,7 +262,7 @@ namespace Chess_UI
 
         private void On_From_Position_Selected(APosition pos)
         {
-            IEnumerable<AMove> moves = Game_Engine.Get_Legal_Moves_For_Piece(pos);
+            IEnumerable<AMove> moves = Game_State.Get_Legal_Moves_For_Piece(pos);
 
             if (moves.Any() )
             {
@@ -279,7 +299,7 @@ namespace Chess_UI
         private void Handle_Promotion(APosition from_pos, APosition to_pos)
         {
             Promotion_Menu promotion_menu;
-            EColor current_player_color = Game_Engine.Current_Player_Color;
+            EColor current_player_color = Game_State.Current_Player_Color;
 
             Piece_Images[to_pos.Row, to_pos.Column].Source = AsImages.Get_Image(current_player_color, EPiece_Type.Pawn);
             Piece_Images[to_pos.Row, to_pos.Column].Source = null;
@@ -299,11 +319,17 @@ namespace Chess_UI
 
         private void Handle_Move(AMove move)
         {
-            Game_Engine.Act_Move(move);
-            Draw_Board(Game_Engine.Board);
-            Set_Cursor(Game_Engine.Current_Player_Color);
+            bool is_capture;
 
-            if (Game_Engine.Is_Game_Over() )
+            is_capture = Game_State.Has_Piece_At(move.To_Position);
+
+            Game_State.Act_Move(move);
+            Draw_Board(Game_State.Board);
+            Set_Cursor(Game_State.Current_Player_Color);
+
+            Sound_System.Play_Move_Sound(move.Move_Type, is_capture);
+
+            if (Game_State.Is_Game_Over() )
             {
                 Show_Game_Over();
             }
@@ -316,6 +342,23 @@ namespace Chess_UI
             foreach (AMove move in moves)
             {
                 Move_Cache[move.To_Position] = move;
+            }
+        }
+
+        private void Show_Check_King_Position()
+        {
+            if (Check_King_Pos != null)
+            {
+                Highlights[Check_King_Pos.Row, Check_King_Pos.Column].Fill = new SolidColorBrush(Check_Highlight);
+            }
+        }
+
+        private void Hide_Check_King_Position()
+        {
+            if (Check_King_Pos != null)
+            {
+                Highlights[Check_King_Pos.Row, Check_King_Pos.Column].Fill = Brushes.Transparent;
+
             }
         }
 
@@ -353,7 +396,7 @@ namespace Chess_UI
 
         private void Show_Game_Over()
         {
-            Game_Over_Menu game_over_menu = new Game_Over_Menu(Game_Engine.Result, Game_Engine.Current_Player_Color);
+            Game_Over_Menu game_over_menu = new Game_Over_Menu(Game_State.Result, Game_State.Current_Player_Color);
             Menu_Container.Content = game_over_menu;
 
             game_over_menu.Option_Selected += option =>
@@ -392,9 +435,9 @@ namespace Chess_UI
             Selected_Position = null;
             Hide_Highlights();
             Move_Cache.Clear();
-            Game_Engine.Restart();
-            Draw_Board(Game_Engine.Board);
-            Set_Cursor(Game_Engine.Current_Player_Color);
+            Game_State.Restart();
+            Draw_Board(Game_State.Board);
+            Set_Cursor(Game_State.Current_Player_Color);
         }
     }
 }

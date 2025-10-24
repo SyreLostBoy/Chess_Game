@@ -32,7 +32,7 @@
             return Get_Forward_Moves(from_pos, board).Concat(Get_Diagonal_Moves(from_pos, board));
         }
 
-        public override bool Can_Capture_King(APosition from_pos, ABoard board)
+        public override bool Can_Capture_King(APosition from_pos, ABoard board, ref APosition king_pos)
         {
             APiece piece;
 
@@ -42,10 +42,12 @@
 
                 if (piece != null && piece.Type == EPiece_Type.King)
                 {
+                    king_pos = move.To_Position;
                     return true;
                 }
             }
 
+            king_pos = null;
             return false;
         }
 

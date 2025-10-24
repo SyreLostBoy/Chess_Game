@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Chess_Logic
 {
-    public class AsGame_Engine
+    public class AsGame_State
     {
         public ABoard Board { get; private set; }
         public AResult Result { get; private set; } = null;
@@ -18,7 +12,7 @@ namespace Chess_Logic
 
         private readonly Dictionary<string, int> State_History = new Dictionary<string, int>();
 
-        public AsGame_Engine(EColor current_player_color, ABoard board)
+        public AsGame_State(EColor current_player_color, ABoard board)
         {
             Current_Player_Color = current_player_color;
             Board = board;
@@ -78,9 +72,24 @@ namespace Chess_Logic
             return move_candidates.Where(move => move.Is_Legal(Board) );
         }
 
+        public bool Has_Piece_At(APosition pos)
+        {
+            return !Board.Is_Empty(pos);
+        }
+
         public bool Is_Game_Over()
         {
             return Result != null;
+        }
+
+        public APosition Get_Check_King_Position()
+        {
+            if (Board.Is_In_Check(Current_Player_Color) )
+            {
+                return Board.Check_King_Position;
+            }
+
+            return null;
         }
 
         public void Restart()
@@ -111,6 +120,7 @@ namespace Chess_Logic
 
         private void Check_For_Game_Over()
         {
+
             if (!Get_All_Legal_Moves_For(Current_Player_Color).Any() )
             {
                 if (Board.Is_In_Check(Current_Player_Color) )

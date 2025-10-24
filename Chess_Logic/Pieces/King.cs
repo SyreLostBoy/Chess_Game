@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Chess_Logic
+﻿namespace Chess_Logic
 {
     public class AKing : APiece
     {
@@ -52,7 +46,7 @@ namespace Chess_Logic
             }
         }
 
-        public override bool Can_Capture_King(APosition from_pos, ABoard board)
+        public override bool Can_Capture_King(APosition from_pos, ABoard board, ref APosition king_pos)
         {
             APiece piece;
 
@@ -62,9 +56,12 @@ namespace Chess_Logic
 
                 if (piece != null && piece.Type == EPiece_Type.King)
                 {
+                    king_pos = move.To_Position;
                     return true;
                 }
             }
+
+            king_pos = null;
 
             return false;
         }

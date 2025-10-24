@@ -20,7 +20,7 @@
               
 
             <Grid.Background>
-                <ImageBrush ImageSource="/Assets/Board.png"></ImageBrush>
+                <ImageBrush ImageSource="/Assets/BoardBrown.png"></ImageBrush>
             </Grid.Background>
 
             <UniformGrid x:Name="Highlight_Grid"
