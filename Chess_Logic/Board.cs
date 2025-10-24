@@ -278,7 +278,7 @@ namespace Chess_Logic
         }
 
         private void Add_Start_Pieces()
-        {// Legacy
+        {// Legacy. Теперь используется инициализация доски из FEN строки
 
             // 1. Задний ряд
             // 1.1 Черные фигуры

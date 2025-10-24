@@ -101,6 +101,12 @@ namespace Chess_Logic
                     {
                         piece = Get_Piece_From_Char(c);
                         board[row, col] = piece;
+
+                        if (piece.Type == EPiece_Type.Pawn)
+                        {
+                            Set_Pawn_Moved_State(piece, row, piece.Color);
+                        }
+
                         col++;
                     }
 
@@ -197,6 +203,19 @@ namespace Chess_Logic
             }
 
             return piece_char;
+        }
+        private static void Set_Pawn_Moved_State(APiece pawn, int row, EColor color)
+        {
+            bool is_on_starting_position;
+
+            if (pawn == null || pawn.Type != EPiece_Type.Pawn)
+            {
+                return;
+            }
+
+            is_on_starting_position = (color == EColor.White && row == 6) || (color == EColor.Black && row == 1);
+
+            pawn.Has_Moved = !is_on_starting_position;
         }
 
         private static void Parse_Castling_Rights(string castling_rights, ABoard board)
