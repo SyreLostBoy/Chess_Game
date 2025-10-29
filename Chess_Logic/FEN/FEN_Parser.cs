@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Chess_Logic
 {
-    public class AsFen_Parser
+    public static class AsFen_Parser
     {
         public static ABoard Parse_Board_From_FEN(string fen)
         {

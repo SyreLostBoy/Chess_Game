@@ -171,9 +171,9 @@ namespace Chess_Logic
 
         public void Set_Castling_Right_For(EColor player_color, bool is_king_side)
         {
-            int row = player_color == EColor.White ? 0 : 7;
+            int row = player_color == EColor.White ? 7 : 0;
             int king_col = 4;
-            int rook_col = is_king_side ? 7 : 0;
+            int rook_col = is_king_side ? 0 : 7;
 
             APiece king_piece = this[row, king_col];
             APiece rook_piece = this[row, rook_col];

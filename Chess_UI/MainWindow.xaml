@@ -5,37 +5,77 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Chess_UI"
         mc:Ignorable="d"
-        Title="Шахматы" SizeToContent="Height" Width="600"
+        Title="Шахматы" SizeToContent="Height" Width="650"
         Icon="/Assets/icon.ico"
         WindowStartupLocation ="CenterScreen"
         Background="Black"
         KeyDown="On_Window_Key_Down">
     <Viewbox>
-        <Grid x:Name="Board_Grid" 
-              Width="600" 
-              Height="600"
-              MouseDown="On_Board_Grid_Mouse_Down"
-              MouseMove="On_Board_Grid_Mouse_Move"
-              MouseUp="On_Board_Grid_Mouse_Up">
-              
+        <Grid Width="600" Height="600">
+            <Grid>
+                <Grid x:Name="Board_Grid" 
+                      Width="600" 
+                      Height="600"
+                      MouseDown="On_Board_Grid_Mouse_Down"
+                      MouseMove="On_Board_Grid_Mouse_Move"
+                      MouseUp="On_Board_Grid_Mouse_Up">
 
-            <Grid.Background>
-                <ImageBrush ImageSource="/Assets/BoardBrown.png"></ImageBrush>
-            </Grid.Background>
+                    <Grid.Background>
+                        <ImageBrush ImageSource="/Assets/BoardBrown.png"></ImageBrush>
+                    </Grid.Background>
 
-            <UniformGrid x:Name="Highlight_Grid"
-                         Rows="8"
-                         Columns="8">
-                
-            </UniformGrid>
-            
-            <UniformGrid x:Name="Piece_Grid"
-                         Rows="8"
-                         Columns="8"
-                         RenderOptions.BitmapScalingMode="HighQuality">
-            </UniformGrid>
+                    <UniformGrid x:Name="Highlight_Grid"
+                                 Rows="8"
+                                 Columns="8"/>
 
-            <ContentControl x:Name="Menu_Container"/>
+                    <UniformGrid x:Name="Piece_Grid"
+                                 Rows="8"
+                                 Columns="8"
+                                 RenderOptions.BitmapScalingMode="HighQuality"/>
+
+                    <ContentControl x:Name="Menu_Container"/>
+                </Grid>
+            </Grid>
+
+            <!-- Буквенные обозначения столбцов (a-h) -->
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Top"
+                        Margin="0,581,0,0"
+                        Height="24" Width="655" RenderTransformOrigin="0.5,0.5">
+                <StackPanel.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform AngleX="-2.033"/>
+                        <RotateTransform/>
+                        <TranslateTransform X="-0.888"/>
+                    </TransformGroup>
+                </StackPanel.RenderTransform>
+                <TextBlock Text="a" Foreground="LightGray" FontSize="12" FontWeight="Bold" Width="75" TextAlignment="Center"/>
+                <TextBlock Text="b" Foreground="Gray" FontSize="12" FontWeight="Bold" Width="75" TextAlignment="Center"/>
+                <TextBlock Text="c" Foreground="LightGray" FontSize="12" FontWeight="Bold" Width="75" TextAlignment="Center"/>
+                <TextBlock Text="d" Foreground="Gray" FontSize="12" FontWeight="Bold" Width="75" TextAlignment="Center"/>
+                <TextBlock Text="e" Foreground="LightGray" FontSize="12" FontWeight="Bold" Width="75" TextAlignment="Center"/>
+                <TextBlock Text="f" Foreground="Gray" FontSize="12" FontWeight="Bold" Width="75" TextAlignment="Center"/>
+                <TextBlock Text="g" Foreground="LightGray" FontSize="12" FontWeight="Bold" Width="75" TextAlignment="Center"/>
+                <TextBlock Text="h" Foreground="Gray" FontSize="12" FontWeight="Bold" Width="75" TextAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Числовые обозначения строк (1-8) -->
+            <StackPanel Orientation="Vertical" 
+                        HorizontalAlignment="Left" 
+                        VerticalAlignment="Center"
+                        Width="17" Height="594">
+                <TextBlock Text="8" Foreground="Gray" FontSize="12" FontWeight="Bold" Height="75" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="7" Foreground="LightGray" FontSize="12" FontWeight="Bold" Height="75" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="6" Foreground="Gray" FontSize="12" FontWeight="Bold" Height="75" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="5" Foreground="LightGray" FontSize="12" FontWeight="Bold" Height="75" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="4" Foreground="Gray" FontSize="12" FontWeight="Bold" Height="75" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="3" Foreground="LightGray" FontSize="12" FontWeight="Bold" Height="75" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="2" Foreground="Gray" FontSize="12" FontWeight="Bold" Height="75" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="1" Foreground="LightGray" FontSize="12" FontWeight="Bold" Height="75" TextAlignment="Center" VerticalAlignment="Center"/>
+            </StackPanel>
+
         </Grid>
     </Viewbox>
 </Window>

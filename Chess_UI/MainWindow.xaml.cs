@@ -13,23 +13,21 @@ using System.Windows.Shapes;
 
 namespace Chess_UI
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private AsGame_State Game_State;
         private AsSound_System Sound_System;
         private APosition Selected_Position = null;
         private APosition Check_King_Pos;
-        private Color Highlight_Color = Color.FromArgb(150, 125, 255, 125);
-        private Color Check_Highlight = Color.FromArgb(150, 255, 0, 0);
+        
         private bool Is_Dragging = false;
-        private Point Drag_Start_Point;
         private Image Dragged_Piece_Image, Dragged_Piece_Image_Clone;
         private Canvas Drag_Canvas;
+        private Point Drag_Start_Point;
         private APosition Drag_Start_Position;
 
+        private static Color Highlight_Color = Color.FromArgb(150, 125, 255, 125);
+        private static Color Check_Highlight = Color.FromArgb(150, 255, 0, 0);
         private readonly Image[,] Piece_Images = new Image[8, 8];
         private readonly Rectangle[,] Highlights = new Rectangle[8, 8];
         private readonly Dictionary<APosition, AMove> Move_Cache = new Dictionary<APosition, AMove>();
@@ -40,7 +38,7 @@ namespace Chess_UI
             Initialize_Board();
             Initialize_Drag_Canvas();
 
-            Game_State = AsFen_Parser.Parse_Game_State_From_FEN(AsGame_State.Start_Game_State_String);
+            Game_State = AsFen_Parser.Parse_Game_State_From_FEN(AsConfig.Start_Position);
             Sound_System = new AsSound_System();
 
             Draw_Board(Game_State.Board);
@@ -64,7 +62,6 @@ namespace Chess_UI
                     highlight_rectangle = new Rectangle();
                     Highlights[row, col] = highlight_rectangle;
                     Highlight_Grid.Children.Add(highlight_rectangle);
-
                 }
             }
         }
@@ -276,6 +273,9 @@ namespace Chess_UI
         {
             AMove move;
 
+            Dragged_Piece_Image = null;
+            Hide_Highlights();
+
             if (! Move_Cache.TryGetValue(pos, out move) )
             {// Недопустимый ход
                 return;
@@ -291,8 +291,6 @@ namespace Chess_UI
             }
 
             Selected_Position = null;
-            Dragged_Piece_Image = null;
-            Hide_Highlights();
             Move_Cache.Clear();
         }
 

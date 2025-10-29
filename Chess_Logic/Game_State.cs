@@ -7,8 +7,6 @@ namespace Chess_Logic
         public AResult Result { get; private set; } = null;
         public EColor Current_Player_Color { get; private set; }
 
-        public static readonly string Start_Game_State_String = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq —";
-
         private int No_Capture_Or_Pawn_Moves;
         private string State_String;
 
@@ -96,7 +94,7 @@ namespace Chess_Logic
 
         public void Restart()
         {
-            Board = ABoard.Get_Board_From_Fen(Start_Game_State_String);
+            Board = ABoard.Get_Board_From_Fen(AsConfig.Start_Position);
             Current_Player_Color = EColor.White;
             Result = null;
             No_Capture_Or_Pawn_Moves = 0;

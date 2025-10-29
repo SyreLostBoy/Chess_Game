@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Chess_Logic
 {
-    public class AsFEN_Generator
+    public static class AsFEN_Generator
     {
         public static string Generate_State_String(ABoard board, EColor current_player_color)
         {
