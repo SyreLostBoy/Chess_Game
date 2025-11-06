@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Chess_AI\Chess_AI.csproj" />
     <ProjectReference Include="..\Chess_Logic\Chess_Logic.csproj" />
   </ItemGroup>
 

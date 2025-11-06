@@ -19,6 +19,8 @@ namespace Chess_UI
         private AsSound_System Sound_System;
         private APosition Selected_Position = null;
         private APosition Check_King_Pos;
+        private ABot_Controller Bot_Controller;
+        private EColor Bot_Color = EColor.Black;
         
         private bool Is_Dragging = false;
         private Image Dragged_Piece_Image, Dragged_Piece_Image_Clone;
@@ -40,6 +42,7 @@ namespace Chess_UI
 
             Game_State = AsFen_Parser.Parse_Game_State_From_FEN(AsConfig.Start_Position);
             Sound_System = new AsSound_System();
+            Bot_Controller = new ABot_Controller(this);
 
             Draw_Board(Game_State.Board);
 
@@ -127,7 +130,7 @@ namespace Chess_UI
                 return;
             }
 
-            if (Is_Menu_On_Screen() )
+            if (Is_Menu_On_Screen() || (Bot_Controller != null && Bot_Controller.Is_Bot_Turn()) )
             {
                 return;
             }
@@ -315,7 +318,7 @@ namespace Chess_UI
             };
         }
 
-        private void Handle_Move(AMove move)
+        public void Handle_Move(AMove move)
         {
             bool is_capture;
 
@@ -330,6 +333,10 @@ namespace Chess_UI
             if (Game_State.Is_Game_Over() )
             {
                 Show_Game_Over();
+            }
+            else if (Game_State.Current_Player_Color == Bot_Color && !Bot_Controller.Is_Bot_Turn())
+            {
+                Bot_Controller.Make_Bot_Move(Game_State, Bot_Color);
             }
         }
 
@@ -436,6 +443,11 @@ namespace Chess_UI
             Game_State.Restart();
             Draw_Board(Game_State.Board);
             Set_Cursor(Game_State.Current_Player_Color);
+
+            if (Bot_Color == EColor.White)
+            {
+                Bot_Controller.Make_Bot_Move(Game_State, Bot_Color);
+            }
         }
     }
 }

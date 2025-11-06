@@ -42,7 +42,7 @@
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Top"
                         Margin="0,581,0,0"
-                        Height="24" Width="655" RenderTransformOrigin="0.5,0.5">
+                        Height="24" Width="660" RenderTransformOrigin="0.5,0.5">
                 <StackPanel.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform/>
