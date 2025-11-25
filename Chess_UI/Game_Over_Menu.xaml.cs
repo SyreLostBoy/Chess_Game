@@ -1,4 +1,5 @@
-﻿using Chess_Logic;
+﻿using Chess_Engine.Core;
+using Chess_Logic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,70 +22,77 @@ namespace Chess_UI
     /// </summary>
     public partial class Game_Over_Menu : UserControl
     {
-        public event Action<EOption> Option_Selected;
+        public event Action OnRestart;
+        public event Action OnExit;
 
-        public Game_Over_Menu(AResult result, EColor current_player)
+        public Game_Over_Menu()
         {
             InitializeComponent();
-
-            Winner_Text.Text = Get_Winner_Text(result.Winner);
-            Reason_Text.Text = Get_Reason_Text(result.End_Reason, current_player);
         }
 
-        private void On_Restart_Click(object sender, RoutedEventArgs event_args)
+        public void SetResult(EGame_Result result)
         {
-            Option_Selected?.Invoke(EOption.Restart);
-        }
-
-        private void On_Exit_Click(object sender, RoutedEventArgs event_args)
-        {
-            Option_Selected?.Invoke(EOption.Exit);
-        }
-        private static string Get_Winner_Text(EColor winner_color)
-        {
-            switch (winner_color)
+            switch (result)
             {
-                case EColor.White:
-                    return "ПОБЕДА БЕЛОГО";
-                case EColor.Black:
-                    return "ПОБЕДА ЧЕРНОГО";
-                case EColor.None:
+                case EGame_Result.White_Is_Mated:
+                    Winner_Text.Text = "ЧЁРНЫЕ ПОБЕДИЛИ";
+                    Reason_Text.Text = "Мат";
+                    break;
+                case EGame_Result.Black_Is_Mated:
+                    Winner_Text.Text = "БЕЛЫЕ ПОБЕДИЛИ";
+                    Reason_Text.Text = "Мат";
+                    break;
+                case EGame_Result.Stalemate:
+                    Winner_Text.Text = "НИЧЬЯ";
+                    Reason_Text.Text = "Пат";
+                    break;
+                case EGame_Result.Fifty_Move_Rule:
+                    Winner_Text.Text = "НИЧЬЯ";
+                    Reason_Text.Text = "Правило 50 ходов";
+                    break;
+                case EGame_Result.Repetition:
+                    Winner_Text.Text = "НИЧЬЯ";
+                    Reason_Text.Text = "Троекратное повторение";
+                    break;
+                case EGame_Result.Insufficient_Material:
+                    Winner_Text.Text = "НИЧЬЯ";
+                    Reason_Text.Text = "Недостаточно материала";
+                    break;
+                case EGame_Result.White_Timeout:
+                    Winner_Text.Text = "ЧЁРНЫЕ ПОБЕДИЛИ";
+                    Reason_Text.Text = "Время белых вышло";
+                    break;
+                case EGame_Result.Black_Timeout:
+                    Winner_Text.Text = "БЕЛЫЕ ПОБЕДИЛИ";
+                    Reason_Text.Text = "Время чёрных вышло";
+                    break;
+                case EGame_Result.White_Illegal_Move:
+                    Winner_Text.Text = "ЧЁРНЫЕ ПОБЕДИЛИ";
+                    Reason_Text.Text = "Нелегальный ход белых";
+                    break;
+                case EGame_Result.Black_Illegal_Move:
+                    Winner_Text.Text = "БЕЛЫЕ ПОБЕДИЛИ";
+                    Reason_Text.Text = "Нелегальный ход чёрных";
+                    break;
+                case EGame_Result.Draw_By_Arbiter:
+                    Winner_Text.Text = "НИЧЬЯ";
+                    Reason_Text.Text = "Решение арбитра";
+                    break;
                 default:
-                    return "НИЧЬЯ";
+                    Winner_Text.Text = "ИГРА ОКОНЧЕНА";
+                    Reason_Text.Text = "Неизвестный результат";
+                    break;
             }
         }
 
-        private static string Get_Player_String(EColor winner_color)
+        private void On_Restart_Click(object sender, RoutedEventArgs e)
         {
-            switch (winner_color)
-            {
-                case EColor.White:
-                    return "БЕЛЫЕ";
-                case EColor.Black:
-                    return "ЧЁРНЫЕ";
-                case EColor.None:
-                default:
-                    return "";
-            }
+            OnRestart?.Invoke();
         }
 
-        private static string Get_Reason_Text(EEnd_Reason reason, EColor current_player)
+        private void On_Exit_Click(object sender, RoutedEventArgs e)
         {
-            switch (reason)
-            {
-                case EEnd_Reason.Checkmate:
-                    return $"ШАХ И МАТ \n {Get_Player_String(current_player)} НЕ ИМЕЮТ ХОДОВ";
-                case EEnd_Reason.Stalemate:
-                    return $"ПАТ \n { Get_Player_String(current_player)} НЕ ИМЕЮТ ХОДОВ";
-                case EEnd_Reason.Fifty_Move_Rule:
-                    return "ПРАВИЛО 50 ХОДОВ";
-                case EEnd_Reason.Insufficient_Material:
-                    return "МЁРТВАЯ ПОЗИЦИЯ (НЕДОСТАТОЧНО ФИГУР)";
-                case EEnd_Reason.Threefold_Repetition:
-                    return "ТРОЕКРАТНОЕ ПОВТОРЕНИЕ";
-                default:
-                    return "НЕИЗВЕСТНАЯ ПРИЧИНА";
-            }
+            OnExit?.Invoke();
         }
     }
 }

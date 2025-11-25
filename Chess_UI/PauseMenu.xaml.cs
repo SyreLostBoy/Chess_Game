@@ -20,21 +20,22 @@ namespace Chess_UI
     /// </summary>
     public partial class PauseMenu : UserControl
     {
-        public event Action<EOption> Option_Selected;
+        public event Action OnContinue;
+        public event Action OnRestart;
 
         public PauseMenu()
         {
             InitializeComponent();
         }
 
-        private void On_Continue_Click(object sender, RoutedEventArgs event_args)
+        private void On_Continue_Click(object sender, RoutedEventArgs e)
         {
-            Option_Selected?.Invoke(EOption.Continue);
+            OnContinue?.Invoke();
         }
 
-        private void On_Restart_Click(object sender, RoutedEventArgs event_args)
+        private void On_Restart_Click(object sender, RoutedEventArgs e)
         {
-            Option_Selected?.Invoke(EOption.Restart);
+            OnRestart?.Invoke();
         }
     }
 }

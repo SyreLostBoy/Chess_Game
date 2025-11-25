@@ -31,7 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Chess_AI\Chess_AI.csproj" />
-    <ProjectReference Include="..\Chess_Logic\Chess_Logic.csproj" />
+    <ProjectReference Include="..\Chess_Engine\Chess_Engine.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,6 +39,9 @@
 	<Content Include="Assets\Audio\**">
 		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	</Content>
+	  <Content Include="Assets\Opening_Book\**">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
   </ItemGroup>
 
   <ItemGroup>
