@@ -1,20 +1,11 @@
 ﻿using Chess_Engine.Helpers;
 using Chess_Engine.Helpers.Bitboard.Magics;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection.PortableExecutable;
-using System.Runtime.CompilerServices;
-using System.Runtime.ExceptionServices;
-using System.Text;
-using System.Threading.Tasks;
 
 using static Chess_Engine.Core.AsPrecomputed_Move_Data;
 
 namespace Chess_Engine.Core
 {
-    public enum EPromotion_Mode 
+    public enum EPromotion_Mode
     {
         All,
         Queen_Only,
@@ -23,7 +14,7 @@ namespace Chess_Engine.Core
 
     public class AMove_Generator
     {
-        public const int Max_Moves = 218;
+        public const int Max_Moves = 256;
         public EPromotion_Mode Promotion_Mode = EPromotion_Mode.All;
 
         ABoard Board;
@@ -31,14 +22,12 @@ namespace Chess_Engine.Core
         bool Generate_Quiet_Moves;
 
         bool Is_White_To_Move;
-        int Friendly_Colour;
-        int Opponent_Colour;
+        int Friendly_Color, Opponent_Color;
         int Friendly_King_Square;
         int Friendly_Index;
         int Enemy_Index;
 
-        bool In_Check;
-        bool In_Double_Check;
+        bool In_Check, In_Double_Check;
         ulong Check_Ray_Bitmask;
         ulong Pin_Rays;
         ulong Not_Pin_Rays;
@@ -47,8 +36,7 @@ namespace Chess_Engine.Core
         public ulong Opponent_Pawn_Attack_Map;
         ulong Opponent_Sliding_Attack_Map;
 
-        ulong Enemy_Pieces;
-        ulong Friendly_Pieces;
+        ulong Enemy_Pieces, Friendly_Pieces;
         ulong All_Pieces;
         ulong Empty_Squares;
         ulong Empty_Or_Enemy_Squares;
@@ -89,7 +77,7 @@ namespace Chess_Engine.Core
             return In_Check;
         }
 
-        void Initialize_Generator_State()
+        private void Initialize_Generator_State()
         {
             Curr_Move_Index = 0;
             In_Check = false;
@@ -98,8 +86,8 @@ namespace Chess_Engine.Core
             Pin_Rays = 0;
 
             Is_White_To_Move = Board.Move_Color == APiece.White;
-            Friendly_Colour = Board.Move_Color;
-            Opponent_Colour = Board.Opponent_Color;
+            Friendly_Color = Board.Move_Color;
+            Opponent_Color = Board.Opponent_Color;
             Friendly_King_Square = Board.King_Square[Board.Move_Color_Index];
             Friendly_Index = Board.Move_Color_Index;
             Enemy_Index = 1 - Friendly_Index;
@@ -114,7 +102,7 @@ namespace Chess_Engine.Core
             Calculate_Attack_Data();
         }
 
-        void Generate_King_Moves(Span<SMove> moves)
+        private void Generate_King_Moves(Span<SMove> moves)
         {
             Generate_King_Normal_Moves(moves);
 
@@ -124,7 +112,7 @@ namespace Chess_Engine.Core
             }
         }
 
-        void Generate_King_Normal_Moves(Span<SMove> moves)
+        private void Generate_King_Normal_Moves(Span<SMove> moves)
         {
             ulong legal_mask = ~(Opponent_Attack_Map | Friendly_Pieces);
             ulong king_moves = AsPrecomputed_Move_Data.King_Attack_Bitboards[Friendly_King_Square] & legal_mask & Move_Type_Mask;
@@ -136,7 +124,7 @@ namespace Chess_Engine.Core
             }
         }
 
-        void Generate_Castling_Moves(Span<SMove> moves)
+        private void Generate_Castling_Moves(Span<SMove> moves)
         {
             ulong castle_blockers = Opponent_Attack_Map | Board.All_Pieces_Bitboard;
 
@@ -151,9 +139,10 @@ namespace Chess_Engine.Core
             }
         }
 
-        void Try_Generate_Kingside_Castle(ulong castle_blockers, Span<SMove> moves)
+        private void Try_Generate_Kingside_Castle(ulong castle_blockers, Span<SMove> moves)
         {
             ulong castle_mask = Board.Is_White_To_Move ? AsBit_Masks.White_Kingside_Mask : AsBit_Masks.Black_Kingside_Mask;
+
             if ((castle_mask & castle_blockers) == 0)
             {
                 int target_square = Board.Is_White_To_Move ? AsBoard_Helper.g1 : AsBoard_Helper.g8;
@@ -161,7 +150,7 @@ namespace Chess_Engine.Core
             }
         }
 
-        void Try_Generate_Queenside_Castle(ulong castle_blockers, Span<SMove> moves)
+        private void Try_Generate_Queenside_Castle(ulong castle_blockers, Span<SMove> moves)
         {
             ulong castle_mask = Board.Is_White_To_Move ? AsBit_Masks.White_Queenside_Mask_2 : AsBit_Masks.Black_Queenside_Mask_2;
             ulong castle_block_mask = Board.Is_White_To_Move ? AsBit_Masks.White_Queenside_Mask : AsBit_Masks.Black_Queenside_Mask;
@@ -173,17 +162,21 @@ namespace Chess_Engine.Core
             }
         }
 
-        void Generate_Sliding_Moves(Span<SMove> moves)
+        private void Generate_Sliding_Moves(Span<SMove> moves)
         {
             ulong move_mask = Empty_Or_Enemy_Squares & Check_Ray_Bitmask & Move_Type_Mask;
             Generate_Orthogonal_Slider_Moves(move_mask, moves);
             Generate_Diagonal_Slider_Moves(move_mask, moves);
         }
 
-        void Generate_Orthogonal_Slider_Moves(ulong move_mask, Span<SMove> moves)
+        private void Generate_Orthogonal_Slider_Moves(ulong move_mask, Span<SMove> moves)
         {
             ulong sliders = Board.Friendly_Orthogonal_Sliders;
-            if (In_Check) sliders &= ~Pin_Rays;
+
+            if (In_Check)
+            {
+                sliders &= ~Pin_Rays;
+            }
 
             while (sliders != 0)
             {
@@ -192,7 +185,7 @@ namespace Chess_Engine.Core
             }
         }
 
-        void Generate_Diagonal_Slider_Moves(ulong move_mask, Span<SMove> moves)
+        private void Generate_Diagonal_Slider_Moves(ulong move_mask, Span<SMove> moves)
         {
             ulong sliders = Board.Friendly_Diagonal_Sliders;
             if (In_Check) sliders &= ~Pin_Rays;
@@ -204,7 +197,7 @@ namespace Chess_Engine.Core
             }
         }
 
-        void Generate_Slider_Moves_For_Square(int start_square, ulong move_mask, bool is_orthogonal, Span<SMove> moves)
+        private void Generate_Slider_Moves_For_Square(int start_square, ulong move_mask, bool is_orthogonal, Span<SMove> moves)
         {
             ulong move_squares = is_orthogonal ? AsBitboard_Magics.Get_Rook_Attacks(start_square, All_Pieces) : AsBitboard_Magics.Get_Bishop_Attacks(start_square, All_Pieces);
 
@@ -222,7 +215,7 @@ namespace Chess_Engine.Core
             }
         }
 
-        void Generate_Knight_Moves(Span<SMove> moves)
+        private void Generate_Knight_Moves(Span<SMove> moves)
         {
             ulong knights = Get_Unpinned_Knights();
             ulong move_mask = Empty_Or_Enemy_Squares & Check_Ray_Bitmask & Move_Type_Mask;
@@ -234,13 +227,13 @@ namespace Chess_Engine.Core
             }
         }
 
-        ulong Get_Unpinned_Knights()
+        private ulong Get_Unpinned_Knights()
         {
             int friendly_knight_piece = APiece.Make_Piece(EPiece_Type.Knight, Board.Move_Color);
             return Board.Piece_Bitboards[friendly_knight_piece] & Not_Pin_Rays;
         }
 
-        void Generate_Knight_Moves_For_Square(int knight_square, ulong move_mask, Span<SMove> moves)
+        private void Generate_Knight_Moves_For_Square(int knight_square, ulong move_mask, Span<SMove> moves)
         {
             ulong move_squares = AsPrecomputed_Move_Data.Knight_Attack_Bitboards[knight_square] & move_mask;
 
@@ -251,7 +244,7 @@ namespace Chess_Engine.Core
             }
         }
 
-        void Generate_Pawn_Moves(Span<SMove> moves)
+        private void Generate_Pawn_Moves(Span<SMove> moves)
         {
             int push_dir = Get_Pawn_Push_Direction();
             int push_offset = push_dir * Squares_Per_Rank;
@@ -266,7 +259,7 @@ namespace Chess_Engine.Core
             Generate_En_Passant_Moves(pawns, push_dir, push_offset, moves);
         }
 
-        int Get_Pawn_Push_Direction()
+        private int Get_Pawn_Push_Direction()
         {
             return Board.Is_White_To_Move ? White_Pawn_Push_Dir : Black_Pawn_Push_Dir;
         }
@@ -276,19 +269,19 @@ namespace Chess_Engine.Core
             return Board.Piece_Bitboards[APiece.Make_Piece(EPiece_Type.Pawn, Board.Move_Color)];
         }
 
-        void Generate_Pawn_Pushes(ulong pawns, int push_dir, int push_offset, Span<SMove> moves)
+        private void Generate_Pawn_Pushes(ulong pawns, int push_dir, int push_offset, Span<SMove> moves)
         {
             ulong single_push = Calculate_Single_Push(pawns, push_offset);
             Generate_Single_Pushes(single_push, push_offset, moves);
             Generate_Double_Pushes(single_push, push_offset, moves);
         }
 
-        ulong Calculate_Single_Push(ulong pawns, int push_offset)
+        private ulong Calculate_Single_Push(ulong pawns, int push_offset)
         {
             return AsBitboard_Utility.Shift(pawns, push_offset) & Empty_Squares;
         }
 
-        void Generate_Single_Pushes(ulong single_push, int push_offset, Span<SMove> moves)
+        private void Generate_Single_Pushes(ulong single_push, int push_offset, Span<SMove> moves)
         {
             ulong promotion_rank_mask = Get_Promotion_Rank_Mask();
             ulong single_push_no_promotions = single_push & ~promotion_rank_mask & Check_Ray_Bitmask;
@@ -298,7 +291,7 @@ namespace Chess_Engine.Core
             Generate_Pawn_Promotions(push_promotions, push_offset, false, moves);
         }
 
-        void Generate_Double_Pushes(ulong single_push, int push_offset, Span<SMove> moves)
+        private void Generate_Double_Pushes(ulong single_push, int push_offset, Span<SMove> moves)
         {
             ulong double_push_target_rank_mask = Board.Is_White_To_Move ? AsBitboard_Utility.Rank_4 : AsBitboard_Utility.Rank_5;
             ulong double_push = AsBitboard_Utility.Shift(single_push, push_offset) & Empty_Squares & double_push_target_rank_mask & Check_Ray_Bitmask;
@@ -306,7 +299,7 @@ namespace Chess_Engine.Core
             Generate_Basic_Pawn_Moves(double_push, push_offset * 2, SMove.Pawn_Double_Move_Flag, moves);
         }
 
-        void Generate_Pawn_Captures(ulong pawns, int push_dir, Span<SMove> moves)
+        private void Generate_Pawn_Captures(ulong pawns, int push_dir, Span<SMove> moves)
         {
             var (capture_left, capture_right) = Calculate_Pawn_Captures(pawns, push_dir);
             ulong promotion_rank_mask = Get_Promotion_Rank_Mask();
@@ -315,7 +308,7 @@ namespace Chess_Engine.Core
             Process_Pawn_Captures(capture_right, push_dir * 9, promotion_rank_mask, moves);
         }
 
-        (ulong capture_left, ulong capture_right) Calculate_Pawn_Captures(ulong pawns, int push_dir)
+        private (ulong capture_left, ulong capture_right) Calculate_Pawn_Captures(ulong pawns, int push_dir)
         {
             ulong left_file_mask = Board.Is_White_To_Move ? AsBitboard_Utility.Not_A_File : AsBitboard_Utility.Not_H_File;
             ulong right_file_mask = Board.Is_White_To_Move ? AsBitboard_Utility.Not_H_File : AsBitboard_Utility.Not_A_File;
@@ -326,7 +319,7 @@ namespace Chess_Engine.Core
             return (capture_left, capture_right);
         }
 
-        void Process_Pawn_Captures(ulong capture_squares, int offset, ulong promotion_rank_mask, Span<SMove> moves)
+        private void Process_Pawn_Captures(ulong capture_squares, int offset, ulong promotion_rank_mask, Span<SMove> moves)
         {
             ulong normal_captures = capture_squares & ~promotion_rank_mask & Check_Ray_Bitmask;
             ulong promotion_captures = capture_squares & promotion_rank_mask & Check_Ray_Bitmask;
@@ -335,12 +328,12 @@ namespace Chess_Engine.Core
             Generate_Pawn_Promotions(promotion_captures, offset, true, moves);
         }
 
-        ulong Get_Promotion_Rank_Mask()
+        private ulong Get_Promotion_Rank_Mask()
         {
             return Board.Is_White_To_Move ? AsBitboard_Utility.Rank_8 : AsBitboard_Utility.Rank_1;
         }
 
-        void Generate_Basic_Pawn_Moves(ulong target_squares, int offset, int move_flag, Span<SMove> moves)
+        private void Generate_Basic_Pawn_Moves(ulong target_squares, int offset, int move_flag, Span<SMove> moves)
         {
             while (target_squares != 0)
             {
@@ -354,7 +347,7 @@ namespace Chess_Engine.Core
             }
         }
 
-        void Generate_Pawn_Promotions(ulong promotion_squares, int offset, bool is_capture, Span<SMove> moves)
+        private void Generate_Pawn_Promotions(ulong promotion_squares, int offset, bool is_capture, Span<SMove> moves)
         {
             while (promotion_squares != 0)
             {
@@ -368,17 +361,17 @@ namespace Chess_Engine.Core
             }
         }
 
-        bool Can_Pawn_Move_Safely(int start_square, int target_square)
+        private bool Can_Pawn_Move_Safely(int start_square, int target_square)
         {
             return !Is_Pinned(start_square) || AsPrecomputed_Move_Data.Align_Mask[start_square, Friendly_King_Square] == AsPrecomputed_Move_Data.Align_Mask[target_square, Friendly_King_Square];
         }
 
-        bool Can_Pawn_Promote_Safely(int start_square, int target_square, bool is_capture)
+        private bool Can_Pawn_Promote_Safely(int start_square, int target_square, bool is_capture)
         {
             return !Is_Pinned(start_square) || (is_capture && Can_Pawn_Move_Safely(start_square, target_square));
         }
 
-        void Generate_En_Passant_Moves(ulong pawns, int push_dir, int push_offset, Span<SMove> moves)
+        private void Generate_En_Passant_Moves(ulong pawns, int push_dir, int push_offset, Span<SMove> moves)
         {
             if (Board.Current_Game_State.En_Passant_File <= 0) return;
 
@@ -399,16 +392,17 @@ namespace Chess_Engine.Core
             }
         }
 
-        (int target_square, int captured_pawn_square) Calculate_En_Passant_Squares(int push_dir, int push_offset)
+        private (int target_square, int captured_pawn_square) Calculate_En_Passant_Squares(int push_dir, int push_offset)
         {
             int ep_file_index = Board.Current_Game_State.En_Passant_File - 1;
             int ep_rank_index = Board.Is_White_To_Move ? 5 : 2;
             int target_square = ep_rank_index * 8 + ep_file_index;
             int captured_pawn_square = target_square - push_offset;
+            
             return (target_square, captured_pawn_square);
         }
 
-        void Generate_Promotions(int start_square, int target_square, Span<SMove> moves)
+        private void Generate_Promotions(int start_square, int target_square, Span<SMove> moves)
         {
             moves[Curr_Move_Index++] = new SMove(start_square, target_square, SMove.Promote_To_Queen_Flag);
 
@@ -427,12 +421,12 @@ namespace Chess_Engine.Core
             }
         }
 
-        bool Is_Pinned(int square)
+        private bool Is_Pinned(int square)
         {
             return ((Pin_Rays >> square) & 1) != 0;
         }
 
-        void Calculate_Attack_Data()
+        private void Calculate_Attack_Data()
         {
             Gen_Sliding_Attack_Map();
 
@@ -455,54 +449,7 @@ namespace Chess_Engine.Core
                     continue;
                 }
 
-                int n = AsPrecomputed_Move_Data.Num_Squares_To_Edge[Friendly_King_Square][dir];
-                int direction_offset = AsPrecomputed_Move_Data.Direction_Offsets[dir];
-                bool is_friendly_piece_along_ray = false;
-                ulong ray_mask = 0;
-
-                for (int i = 0; i < n; i++)
-                {
-                    int square_index = Friendly_King_Square + direction_offset * (i + 1);
-                    ray_mask |= 1ul << square_index;
-                    int piece = Board.Square[square_index];
-                    EPiece_Type piece_type = APiece.Get_Piece_Type(piece);
-
-                    if (piece_type != EPiece_Type.None)
-                    {
-                        if (APiece.Is_Color(piece, Friendly_Colour))
-                        {
-                            if (!is_friendly_piece_along_ray)
-                            {
-                                is_friendly_piece_along_ray = true;
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            if ((is_diagonal && APiece.Is_Diagonal_Slider(piece)) || (!is_diagonal && APiece.Is_Orthogonal_Slider(piece)))
-                            {
-                                if (is_friendly_piece_along_ray)
-                                {
-                                    Pin_Rays |= ray_mask;
-                                }
-                                else
-                                {
-                                    Check_Ray_Bitmask |= ray_mask;
-                                    In_Double_Check = In_Check;
-                                    In_Check = true;
-                                }
-                                break;
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                    }
-                }
+                Find_Checks_And_Pins_In_Direction(dir);
 
                 if (In_Double_Check)
                 {
@@ -512,6 +459,77 @@ namespace Chess_Engine.Core
 
             Not_Pin_Rays = ~Pin_Rays;
 
+            // Knight attacks
+            ulong opponent_knight_attacks = Calculate_Knight_Threats();
+
+            // Pawn attacks
+            Calculate_Pawn_Threats(opponent_knight_attacks);
+
+            int enemy_king_square = Board.King_Square[Enemy_Index];
+            Opponent_Attack_Map_No_Pawns = Opponent_Sliding_Attack_Map | opponent_knight_attacks | AsPrecomputed_Move_Data.King_Attack_Bitboards[enemy_king_square];
+            Opponent_Attack_Map = Opponent_Attack_Map_No_Pawns | Opponent_Pawn_Attack_Map;
+
+            if (!In_Check)
+            {
+                Check_Ray_Bitmask = ulong.MaxValue;
+            }
+        }
+
+        private void Find_Checks_And_Pins_In_Direction(int direction)
+        {
+            bool is_diagonal = direction > 3;
+            int n = AsPrecomputed_Move_Data.Num_Squares_To_Edge[Friendly_King_Square][direction];
+            int direction_offset = AsPrecomputed_Move_Data.Direction_Offsets[direction];
+            bool is_friendly_piece_along_ray = false;
+            ulong ray_mask = 0;
+
+            for (int i = 0; i < n; i++)
+            {
+                int square_index = Friendly_King_Square + direction_offset * (i + 1);
+                ray_mask |= 1ul << square_index;
+                int piece = Board.Square[square_index];
+                EPiece_Type piece_type = APiece.Get_Piece_Type(piece);
+
+                if (piece_type == EPiece_Type.None)
+                {
+                    continue;
+                }
+
+                if (APiece.Is_Color(piece, Friendly_Color))
+                {
+                    if (!is_friendly_piece_along_ray)
+                    {
+                        is_friendly_piece_along_ray = true;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else if ((is_diagonal && APiece.Is_Diagonal_Slider(piece)) || (!is_diagonal && APiece.Is_Orthogonal_Slider(piece)))
+                {
+                    if (is_friendly_piece_along_ray)
+                    {
+                        Pin_Rays |= ray_mask;
+                    }
+                    else
+                    {
+                        Check_Ray_Bitmask |= ray_mask;
+                        In_Double_Check = In_Check;
+                        In_Check = true;
+                    }
+
+                    break;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        private ulong Calculate_Knight_Threats()
+        {
             ulong opponent_knight_attacks = 0;
             ulong knights = Board.Piece_Bitboards[APiece.Make_Piece(EPiece_Type.Knight, Board.Opponent_Color)];
             ulong friendly_king_board = Board.Piece_Bitboards[APiece.Make_Piece(EPiece_Type.King, Board.Move_Color)];
@@ -530,6 +548,11 @@ namespace Chess_Engine.Core
                 }
             }
 
+            return opponent_knight_attacks;
+        }
+
+        private void Calculate_Pawn_Threats(ulong opponent_knight_attacks)
+        {
             ulong opponent_pawns_board = Board.Piece_Bitboards[APiece.Make_Piece(EPiece_Type.Pawn, Board.Opponent_Color)];
             Opponent_Pawn_Attack_Map = AsBitboard_Utility.Get_Pawn_Attacks(opponent_pawns_board, !Is_White_To_Move);
 
@@ -541,38 +564,29 @@ namespace Chess_Engine.Core
                 ulong pawn_check_map = opponent_pawns_board & possible_pawn_attack_origins;
                 Check_Ray_Bitmask |= pawn_check_map;
             }
-
-            int enemy_king_square = Board.King_Square[Enemy_Index];
-            Opponent_Attack_Map_No_Pawns = Opponent_Sliding_Attack_Map | opponent_knight_attacks | AsPrecomputed_Move_Data.King_Attack_Bitboards[enemy_king_square];
-            Opponent_Attack_Map = Opponent_Attack_Map_No_Pawns | Opponent_Pawn_Attack_Map;
-
-            if (!In_Check)
-            {
-                Check_Ray_Bitmask = ulong.MaxValue;
-            }
         }
 
-        void Gen_Sliding_Attack_Map()
+        private void Gen_Sliding_Attack_Map()
         {
             Opponent_Sliding_Attack_Map = 0;
 
             Update_Slide_Attack(Board.Enemy_Orthogonal_Sliders, true);
             Update_Slide_Attack(Board.Enemy_Diagonal_Sliders, false);
+        }
 
-            void Update_Slide_Attack(ulong piece_board, bool ortho)
+        private void Update_Slide_Attack(ulong piece_board, bool ortho)
+        {
+            ulong blockers = Board.All_Pieces_Bitboard & ~(1ul << Friendly_King_Square);
+
+            while (piece_board != 0)
             {
-                ulong blockers = Board.All_Pieces_Bitboard & ~(1ul << Friendly_King_Square);
-
-                while (piece_board != 0)
-                {
-                    int start_square = AsBitboard_Utility.Pop_LSB(ref piece_board);
-                    ulong move_board = AsBitboard_Magics.Get_Slider_Attacks(start_square, blockers, ortho);
-                    Opponent_Sliding_Attack_Map |= move_board;
-                }
+                int start_square = AsBitboard_Utility.Pop_LSB(ref piece_board);
+                ulong move_board = AsBitboard_Magics.Get_Slider_Attacks(start_square, blockers, ortho);
+                Opponent_Sliding_Attack_Map |= move_board;
             }
         }
 
-        bool In_Check_After_En_Passant(int start_square, int target_square, int ep_capture_square)
+        private bool In_Check_After_En_Passant(int start_square, int target_square, int ep_capture_square)
         {
             ulong enemy_ortho = Board.Enemy_Orthogonal_Sliders;
 

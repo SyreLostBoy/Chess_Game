@@ -1,5 +1,4 @@
 ﻿using Chess_Engine.Core;
-using Chess_Logic;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -154,7 +154,7 @@ namespace Chess_Engine.Core.Evaluation
 
                 if ((friendly_pawns & AsBit_Masks.Adjacent_File_Masks[AsBoard_Helper.File_Index(square)]) == 0)
                 {
-                    num_isolated_pawns++;
+                    Math.Clamp(++num_isolated_pawns, 0, Isolated_Pawn_Penalty_By_Count.Length - 1);
                 }
             }
 
