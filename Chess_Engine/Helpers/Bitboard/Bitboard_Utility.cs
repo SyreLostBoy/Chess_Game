@@ -79,12 +79,11 @@ namespace Chess_Engine.Helpers
 
         public static ulong Get_Pawn_Attacks(ulong pawn_bitboard, bool is_white)
         {
-            // The first half of the attacks are calculated by shifting all pawns north-east: northEastAttacks = pawnBitboard << 9
-            // Note that pawns on the h file will be wrapped around to the a file, so then mask out the a file: northEastAttacks &= notAFile
-            // (Any pawns that were originally on the a file will have been shifted to the b file, so a file should be empty).
-
-            // The other half of the attacks are calculated by shifting all pawns north-west. This time the h file must be masked out.
-            // Combine the two halves to get a bitboard with all the pawn attacks: northEastAttacks | northWestAttacks
+            // Первая половина атак рассчитывается путем смещения всех пешек на северо-восток: northEastAttacks = pawnBitboard << 9
+            // ВАЖНО: Пешки в файле h будут перенесены в файл a, поэтому к файлу a применяется маска: northEastAttacks &= notAFile
+            // (Все пешки, которые изначально были в файле a, будут смещены в файл b, поэтому файл a должен быть пустым).
+            // Вторая половина атак рассчитывается путем смещения всех пешек на северо-запад. На этот раз необходимо примениить маску к файлу h.
+            // Объединяем две половины, чтобы получить битовую доску со всеми атаками пешек: northEastAttacks | northWestAttacks
 
             if (is_white)
             {
@@ -118,7 +117,7 @@ namespace Chess_Engine.Helpers
 
             for (int dir_index = 0; dir_index < 4; dir_index++)
             {
-                // Orthogonal and diagonal directions
+                // Вертикальные и диагональные направления
                 for (int dst = 1; dst < 8; dst++)
                 {
                     int ortho_x = x + ortho_dir[dir_index].x * dst;
@@ -143,7 +142,7 @@ namespace Chess_Engine.Helpers
                     }
                 }
 
-                // Knight jumps
+                // Перемещения коня
                 for (int i = 0; i < knight_jumps.Length; i++)
                 {
                     int knight_x = x + knight_jumps[i].x;
@@ -154,8 +153,7 @@ namespace Chess_Engine.Helpers
                     }
                 }
 
-                // Pawn attacks
-
+                // Атаки пешек
                 if (Valid_Square_Index(x + 1, y + 1, out int white_pawn_right))
                 {
                     White_Pawn_Attacks[square_index] |= 1ul << white_pawn_right;

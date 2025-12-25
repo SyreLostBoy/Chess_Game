@@ -34,7 +34,7 @@ namespace Chess_UI
         private List<Image> Piece_Images = new List<Image>();
         private List<Border> Highlight_Borders = new List<Border>();
 
-        //Constants
+        //Константы
         public static readonly Color Highlight_Color = Color.FromArgb(150, 125, 255, 125);
         public static readonly Color Capture_Highlight = Color.FromArgb(180, 255, 100, 100);
         public static readonly Color Check_Highlight = Color.FromArgb(150, 255, 0, 0);

@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace Chess_UI
 {
-    /// <summary>
-    /// Interaction logic for PauseMenu.xaml
-    /// </summary>
     public partial class PauseMenu : UserControl
     {
         public event Action OnContinue;

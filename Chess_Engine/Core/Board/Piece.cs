@@ -25,7 +25,7 @@ namespace Chess_Engine.Core
         public const int White = 0;
         public const int Black = 8;
 
-        // Pieces
+        // Фигуры
         public const int White_Pawn = (int)EPiece_Type.Pawn | White; // 1
         public const int White_Knight = (int)EPiece_Type.Knight | White; // 2
         public const int White_Bishop = (int)EPiece_Type.Bishop | White; // 3
@@ -81,7 +81,7 @@ namespace Chess_Engine.Core
             return (EPiece_Type)(piece & Type_Mask);
         }
 
-        // Rook or Queen
+        // Ладья или ферзь
         public static bool Is_Orthogonal_Slider(int piece)
         {
             EPiece_Type piece_type = Get_Piece_Type(piece);
@@ -89,7 +89,7 @@ namespace Chess_Engine.Core
             return piece_type == EPiece_Type.Queen || piece_type == EPiece_Type.Rook;
         }
 
-        // Queen or Bishop
+        // ферзь или слон
         public static bool Is_Diagonal_Slider(int piece)
         {
             EPiece_Type piece_type = Get_Piece_Type(piece);

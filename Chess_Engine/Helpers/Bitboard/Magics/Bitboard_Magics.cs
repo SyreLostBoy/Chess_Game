@@ -8,10 +8,9 @@ namespace Chess_Engine.Helpers.Bitboard.Magics
 {
     public static class AsBitboard_Magics
     {
-        // Rook and Bishop mask bitboards for each oigin square
-        // A mask is simply the legal moves available to the piece from the origin square
-        // (on an empty board), except that the moves stop 1 square before the edge of the board.
-
+        // Маска для ладьи и слона определяет битовые доски для каждой исходной клетки
+        // Маска — это просто список допустимых ходов, доступных фигуре с исходной клетки
+        // (на пустой доске), за исключением того, что ходы останавливаются на 1 клетку перед краем доски.
         public static readonly ulong[] Rook_Mask;
         public static readonly ulong[] Bishop_Mask;
 

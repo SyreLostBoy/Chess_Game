@@ -15,11 +15,11 @@ namespace Chess_Engine.Core
         public const int White_Index = 0;
         public const int Black_Index = 1;
 
-        public readonly int[] Square; // Stores piece code for each square
-        public int[] King_Square; // Square index of white and black king
+        public readonly int[] Square; // Хранит код фигуры для каждой клетки
+        public int[] King_Square; // Хранит индексы клеток для черного и белого королей
 
-        // Bitboards
-        public ulong[] Piece_Bitboards; // Bitboard for each piece type and color
+        // Битборды
+        public ulong[] Piece_Bitboards; // Битборды для фигур каждого типа и цвета
         public ulong[] Color_Bitboards;
         public ulong All_Pieces_Bitboard;
         public ulong Friendly_Orthogonal_Sliders;
@@ -29,24 +29,23 @@ namespace Chess_Engine.Core
 
         public int Total_Piece_Count_Without_Pawns_And_Kings;
 
-        // Piece Lists
+        // Списки фигур
         public APiece_List[] Rooks;
         public APiece_List[] Bishops;
         public APiece_List[] Queens;
         public APiece_List[] Knights;
         public APiece_List[] Pawns;
 
-        // Side To Move
+        // Ходящая сторона
         public bool Is_White_To_Move;
         public int Move_Color => Is_White_To_Move ? APiece.White : APiece.Black;
         public int Opponent_Color => Is_White_To_Move ? APiece.Black : APiece.White;
         public int Move_Color_Index => Is_White_To_Move ? White_Index : Black_Index;
         public int Opponent_Color_Index => Is_White_To_Move ? Black_Index : White_Index;
 
-        public Stack<ulong> Repetition_Position_History; // List of hased positions since last pawn move or capture
+        public Stack<ulong> Repetition_Position_History; // Список хэшированных позиций с момента последнего хода пешки или взятия
 
-        // Total plies (half moves) played in game
-        public int Ply_Count;
+        public int Ply_Count; // Счетчик полуходов (Plies)
         public int Fify_Move_Counter => Current_Game_State.Fifty_Move_Counter;
         public SGame_State Current_Game_State;
         public ulong Zobrist_Key => Current_Game_State.Zobrist_Key;
@@ -339,7 +338,6 @@ namespace Chess_Engine.Core
             }
         }
 
-        // Switch side to play without making a move
         public void Make_Null_Move()
         {
             Is_White_To_Move = !Is_White_To_Move;
@@ -474,7 +472,7 @@ namespace Chess_Engine.Core
             All_Pieces_Bitboard = Color_Bitboards[White_Index] | Color_Bitboards[Black_Index];
             Update_Slider_Bitboards();
 
-            // Create game state
+            // Создаем SGame_State
             int white_castle = ((pos_info.White_Castle_Kingside) ? 1 << 0 : 0) | ((pos_info.White_Castle_Queenside) ? 1 << 1 : 0);
             int black_castle = ((pos_info.Black_Castle_Kingside) ? 1 << 2 : 0) | ((pos_info.White_Castle_Queenside) ? 1 << 3 : 0);
             int castling_rights = white_castle | black_castle;
@@ -515,12 +513,12 @@ namespace Chess_Engine.Core
             return board;
         }
 
-        // Update piece lists / bitboards based on given move info.
-        // Note that this does not account for the following things, which must be handled separately:
-        // 1. Removal of a captured piece
-        // 2. Movement of rook when castling
-        // 3. Removal of pawn from 1st/8th rank during pawn promotion
-        // 4. Addition of promoted piece during pawn promotion
+        // Обновление списков фигур/битовых досок на основе предоставленной информации о ходах.
+        // Не учитывает следующие моменты, которые необходимо обрабатывать отдельно:
+        // 1. Удаление взятой фигуры
+        // 2. Перемещение ладьи при рокировке
+        // 3. Удаление пешки с 1-й/8-й горизонтали при превращении пешки
+        // 4. Добавление превращенной фигуры при превращении пешки
 
         private void Move_Piece(int piece, int start_square, int target_square)
         {
@@ -596,7 +594,6 @@ namespace Chess_Engine.Core
 
             Total_Piece_Count_Without_Pawns_And_Kings = 0;
 
-            // Initialize bitboards
             Piece_Bitboards = new ulong[APiece.Max_Piece_Index + 1];
             Color_Bitboards = new ulong[2];
             All_Pieces_Bitboard = 0;

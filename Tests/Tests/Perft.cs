@@ -69,7 +69,6 @@ namespace Tests
 
                 nodes += child_Nodes;
 
-                // Для разделенного Perft записываем информацию о каждом ходе
                 if (divided && depth == initial_Depth)
                 {
                     result.Move_Nodes.Add(new Move_Node_Count
@@ -79,7 +78,6 @@ namespace Tests
                     });
                 }
 
-                // Собираем статистику по типам ходов
                 if (depth == 1)
                 {
                     Update_Move_Statistics(move, result);
@@ -96,7 +94,6 @@ namespace Tests
         {
             result.Total_Leaf_Nodes++;
 
-            // Определяем тип хода на основе флагов и состояния доски
             if (move.Move_Flag == SMove.En_Passant_Capture_Flag)
             {
                 result.En_Passants++;
@@ -109,7 +106,7 @@ namespace Tests
             else if (move.Is_Promotion)
             {
                 result.Promotions++;
-                // Проверяем, является ли превращение взятием
+                
                 if (Board.Square[move.Target_Square] != (int)EPiece_Type.None)
                 {
                     result.Captures++;
@@ -117,7 +114,6 @@ namespace Tests
             }
             else
             {
-                // Обычный ход - проверяем взятие
                 if (Board.Square[move.Target_Square] != (int)EPiece_Type.None)
                 {
                     result.Captures++;
@@ -128,12 +124,10 @@ namespace Tests
                 }
             }
 
-            // Проверка шахов
             if (Board.Is_In_Check())
             {
                 result.Checks++;
 
-                // Проверка мата
                 var opponent_Moves = Move_Generator.Generate_Moves(Board);
                 if (opponent_Moves.Length == 0)
                 {
@@ -211,7 +205,6 @@ namespace Tests
                     {
                         Console.WriteLine($"  Difference: {(long)result.Total_Nodes - (long)test.Expected_Nodes[depth - 1]:+##;-##;0}");
 
-                        // Для глубины 1 показываем отладочную информацию
                         if (depth == 1)
                         {
                             Run_Divided_Perft_For_Debug(test.Fen, depth);
@@ -291,7 +284,6 @@ namespace Tests
                 Console.WriteLine($"  {moveStr} ({piece})");
             }
 
-            // Проверим какой ход отсутствует
             Console.WriteLine("\n=== MISSING MOVE ANALYSIS ===");
             Check_Missing_Moves_Position_4();
         }
@@ -334,29 +326,26 @@ namespace Tests
 
         private void Check_Missing_Moves_Position_4()
         {
-            // По стандартным тестам, должен быть ход, который мы не находим
-            // Давайте проверим конкретные кандидаты:
-
             Board.Load_Position("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
 
             // Кандидаты на пропущенный ход:
             var candidateMoves = new[]
             {
-        "b5a6", // взятие пешкой
-        "b5c6", // взятие пешкой  
-        "d1d2", // ход ферзем
-        "d1e2", // ход ферзем
-        "d1c1", // ход ферзем
-        "f1e1", // ход ладьей
-        "f1d1", // ход ладьей
-        "f1c1", // ход ладьей
-        "f1b1", // ход ладьей
-        "f1a1", // ход ладьей
-        "c4f7", // взятие слоном
-        "h6g8", // взятие конем
-        "h6f7", // взятие конем
-        "f3g1"  // ход конем
-    };
+                "b5a6", // взятие пешкой
+                "b5c6", // взятие пешкой  
+                "d1d2", // ход ферзем
+                "d1e2", // ход ферзем
+                "d1c1", // ход ферзем
+                "f1e1", // ход ладьей
+                "f1d1", // ход ладьей
+                "f1c1", // ход ладьей
+                "f1b1", // ход ладьей
+                "f1a1", // ход ладьей
+                "c4f7", // взятие слоном
+                "h6g8", // взятие конем
+                "h6f7", // взятие конем
+                "f3g1"  // ход конем
+            };
 
             foreach (var moveStr in candidateMoves)
             {
@@ -383,7 +372,7 @@ namespace Tests
                 if (Is_Move_Legal(move))
                 {
                     Board.Make_Move(move, true);
-                    ulong nodes = Simple_Perft_Recursive(2); // Используем упрощенную версию
+                    ulong nodes = Simple_Perft_Recursive(2);
                     Board.Unmake_Move(move, true);
 
                     Console.WriteLine($"  {moveStr}: {nodes} nodes at depth 2");
@@ -391,7 +380,6 @@ namespace Tests
             }
         }
 
-        // Упрощенная версия Perft для отладки
         private ulong Simple_Perft_Recursive(int depth)
         {
             if (depth == 0)
@@ -411,14 +399,12 @@ namespace Tests
             return nodes;
         }
 
-        // Также нужно обновить Debug_Position_5_Sequences
         public void Debug_Position_5_Sequences()
         {
             string fen = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8";
 
             Console.WriteLine("=== DEBUG POSITION 5 SEQUENCES ===");
 
-            // Запустим разделенный perft на глубине 3
             Board.Load_Position(fen);
             var moves = Move_Generator.Generate_Moves(Board);
 
@@ -430,13 +416,12 @@ namespace Tests
             {
                 string moveStr = Move_To_String(move);
                 Board.Make_Move(move, true);
-                ulong nodes = Simple_Perft_Recursive(2); // Глубина 2 после первого хода
+                ulong nodes = Simple_Perft_Recursive(2);
                 Board.Unmake_Move(move, true);
 
                 moveNodes.Add((moveStr, nodes));
             }
 
-            // Сортируем по количеству узлов
             var orderedMoves = moveNodes.OrderBy(m => m.Item2).ToList();
 
             Console.WriteLine("\nMoves with lowest node counts (potential issues):");
@@ -451,7 +436,6 @@ namespace Tests
                 Console.WriteLine($"  {moveStr}: {nodes} nodes");
             }
 
-            // Проверим конкретные проблемные ходы
             Check_Specific_Problem_Moves_Position_5(fen);
         }
 
@@ -459,15 +443,14 @@ namespace Tests
         {
             Console.WriteLine("\n=== CHECKING SPECIFIC PROBLEM MOVES ===");
 
-            // Эти ходы могут вызывать проблемы:
             var problematicMoves = new[]
             {
-        "d7c8q", // превращение пешки
-        "d7c8n", // превращение пешки в коня
-        "e1g1",  // рокировка
-        "c4f7",  // взятие слоном
-        "e2f4",  // ход конем (возможное взятие на f4)
-    };
+                "d7c8q", // превращение пешки
+                "d7c8n", // превращение пешки в коня
+                "e1g1",  // рокировка
+                "c4f7",  // взятие слоном
+                "e2f4",  // ход конем (возможное взятие на f4)
+            };
 
             foreach (var moveStr in problematicMoves)
             {
@@ -480,14 +463,12 @@ namespace Tests
                     continue;
                 }
 
-                // Проверим что происходит после этого хода
                 Board.Make_Move(move, true);
                 var responseMoves = Move_Generator.Generate_Moves(Board);
                 Board.Unmake_Move(move, true);
 
                 Console.WriteLine($"Move {moveStr}: leads to {responseMoves.Length} response moves");
 
-                // Если это превращение, проверим все варианты
                 if (moveStr.StartsWith("d7c8"))
                 {
                     Check_Promotion_Variants(fen);
@@ -499,19 +480,16 @@ namespace Tests
         {
             if (move.Is_Null) return false;
 
-            // Проверяем базовую валидность
             int start = move.Start_Square;
             int target = move.Target_Square;
 
             if (start < 0 || start > 63 || target < 0 || target > 63) return false;
             if (Board.Square[start] == (int)EPiece_Type.None) return false;
 
-            // Проверяем что фигура принадлежит правильному игроку
             int pieceColor = APiece.Is_White(Board.Square[start]) ? APiece.White : APiece.Black;
             int currentColor = Board.Is_White_To_Move ? APiece.White : APiece.Black;
             if (pieceColor != currentColor) return false;
 
-            // Проверяем что целевая клетка не занята своей фигурой
             if (Board.Square[target] != (int)EPiece_Type.None)
             {
                 int targetColor = APiece.Is_White(Board.Square[target]) ? APiece.White : APiece.Black;

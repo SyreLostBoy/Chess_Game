@@ -13,13 +13,12 @@ namespace Chess_Engine.Core
         Upper_Bound
     }
 
-    // Transposition table entry
     public struct STT_Entry
-    {
+    { // Запись в таблице транспозиции
         public readonly ulong Key;
         public readonly int Value;
         public readonly SMove Move;
-        public readonly byte Depth; //How many ply were searched ahead from this position
+        public readonly byte Depth; //Сколько полуходов было просмотрено вперед от этой позиции
         public readonly ENode_Type Node_Type;
 
         public STT_Entry(ulong key, int value, byte depth, ENode_Type node_type, SMove move)

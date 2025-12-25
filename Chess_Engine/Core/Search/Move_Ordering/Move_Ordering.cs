@@ -109,7 +109,7 @@ namespace Chess_Engine.Core
                 }
                 else if (move_piece_type == EPiece_Type.King)
                 {
-                    // King moves handled separately
+                    // Ходы короля обрабатываются отдельно
                 }
                 else
                 {

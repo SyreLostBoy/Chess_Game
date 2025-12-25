@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 namespace Chess_Engine.Core
 {
     /*
-    16-bit move representation.
-    The format is as follows (ffffttttttssssss)
-    Bits 0-5: start square index
-    Bits 6-11: target square index
-    Bits 12-15: flag (promotion type, etc)
+    16-битное представление хода.
+    Формат следующий (ffffttttttsssss); f - flag, t - target_square, s - start_square
+    Биты 0-5: индекс начальной клетки
+    Биты 6-11: индекс целевой клетки
+    Биты 12-15: флаг (тип превращения и т. д.)
     */
 
     public struct SMove
     {
-        readonly ushort Move_Value; // 16-bit move value
+        readonly ushort Move_Value; // 16 битное представление хода
 
-        // Flags
+        // Флаги
         public const int No_Flag = 0b0000;
         public const int En_Passant_Capture_Flag = 0b0001;
         public const int Castle_Flag = 0b0010;
@@ -37,7 +37,7 @@ namespace Chess_Engine.Core
         public int Move_Flag => Move_Value >> 12;
         public bool Is_Promotion => Move_Flag >= Promote_To_Queen_Flag;
 
-        // Masks
+        // Маски
         private const ushort Start_Square_Mask = 0b0000000000111111;
         private const ushort Target_Square_Mask = 0b0000111111000000;
         private const ushort Flag_Mask = 0b1111000000000000;

@@ -60,7 +60,7 @@ namespace Chess_Engine.Helpers
         }
 
         /// <summary>
-        /// Получить алгебраическое имя хода (с указанием превращения)
+        /// Возвращает алгебраическое имя хода (с указанием превращения)
         /// Примеры: "e2e4", "e7e8q"
         /// </summary>
         public static string Get_Move_Name_UCI(SMove move)
@@ -92,7 +92,7 @@ namespace Chess_Engine.Helpers
         }
 
         /// <summary>
-        /// Получить имя хода в Стандартной Алгебраической Нотации (SAN)
+        /// Возвращает имя хода в Стандартной Алгебраической Нотации (SAN)
         /// Примеры: "e4", "Bxf7+", "O-O", "Rh8#", "Nfd2"
         /// Примечание: ход еще не должен быть сделан на доске
         /// </summary>
@@ -145,7 +145,7 @@ namespace Chess_Engine.Helpers
         }
 
         /// <summary>
-        /// Получить ход из заданного имени в SAN нотации (например, "Nxf3", "Rad1", "O-O", и т.д.)
+        /// Возвращает ход из заданного имени в SAN нотации (например, "Nxf3", "Rad1", "O-O", и т.д.)
         /// Данная доска должна содержать позицию до того, как ход был сделан
         /// </summary>
         public static SMove Get_Move_From_SAN(ABoard board, string algebraic_move)

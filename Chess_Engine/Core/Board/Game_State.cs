@@ -14,7 +14,7 @@ namespace Chess_Engine.Core
         public readonly int Fifty_Move_Counter;
         public readonly ulong Zobrist_Key;
 
-        // Masks
+        // Маски
         public const int Clear_White_Kingside_Mask = 0b1110;
         public const int Clear_White_Queenside_Mask = 0b1101;
         public const int Clear_Black_Kingside_Mask = 0b1011;

@@ -8,13 +8,13 @@ namespace Chess_Engine.Core
 {
     public static class AsZobrist_Hasher
     {
-        public static readonly ulong[,] Pieces_Array = new ulong[APiece.Max_Piece_Index + 1, 64]; // piece type, color, square index
-        // Each player has 4 possible castling right states: none, queenside, kingside, both.
-        // So, taking both sides into account, there are 16 possible states.
+        public static readonly ulong[,] Pieces_Array = new ulong[APiece.Max_Piece_Index + 1, 64]; // тип фигуры, цвет, индекс клетки
+        // У каждого игрока есть 4 возможных варианта рокировки: ни одного, на ферзевом фланге, на королевском фланге, на обоих.
+        // Таким образом, с учетом обеих сторон, существует 16 возможных вариантов.
         public static readonly ulong[] Castling_Rights = new ulong[16];
         
-        // En passant file (0 = no ep).
-        //  Rank does not need to be specified since side to move is included in key
+        // Файл En passant (0 = нет EP).
+        // Ранг указывать не нужно, так как сторона, на которой нужно сделать ход, включена в ключ.
         public static readonly ulong[] En_Passant_File = new ulong[9];
         public static readonly ulong Side_To_Move;
 
@@ -46,9 +46,10 @@ namespace Chess_Engine.Core
             Side_To_Move = Get_Random_Ulong(rng);
         }
 
-        // Calculate zobrist key from current board position.
-        // NOTE: this function is slow and should only be used when the board is initially set up from fen.
-        // During search, the key should be updated incrementally instead.
+        /// <summary>
+        ///Вычисляет ключ Зобриста на основе текущей позиции на доске.
+        /// ПРИМЕЧАНИЕ: эта функция работает медленно и должна использоваться только при первоначальной настройке доски из FEN-нотации.
+        /// </summary>
         public static ulong Calculate_Zobrist_Key(ABoard board)
         {
             ulong zobrist_key = 0;

@@ -100,7 +100,7 @@ namespace Chess_Engine.Helpers
         }
 
         public static string CreateDiagram(ABoard board, bool black_at_top = true, bool include_fen = true, bool include_zobrist_key = true)
-        {/// Creates an ASCII-diagram of the current position.
+        {// Создает  ASCII-диаграмму текущей позиции.
 
             System.Text.StringBuilder result = new();
             int last_move_square = board.All_Game_Moves.Count > 0 ? board.All_Game_Moves[^1].Target_Square : -1;
@@ -129,14 +129,12 @@ namespace Chess_Engine.Helpers
 
                     if (x == 7)
                     {
-                        // Show rank number
                         result.AppendLine($"| {rank_index + 1}");
                     }
                 }
 
                 if (y == 7)
                 {
-                    // Show file names
                     result.AppendLine("+---+---+---+---+---+---+---+---+");
                     const string file_names = "  a   b   c   d   e   f   g   h  ";
                     const string file_names_rev = "  h   g   f   e   d   c   b   a  ";

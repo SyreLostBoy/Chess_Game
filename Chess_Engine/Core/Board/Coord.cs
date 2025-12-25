@@ -3,10 +3,10 @@
 namespace Chess_Engine.Core
 {
 
-    // Structure for representing squares on the chess board as file/rank integer pairs.
+    // Структура для представления клеток на шахматной доске в виде пар целых чисел вертикали/ранга.
     // (0, 0) = a1, (7, 7) = h8.
-    // Coords can also be used as offsets. For example, while a Coord of (-1, 0) is not
-    // a valid square, it can be used to represent the concept of moving 1 square left.
+    // Координаты также могут использоваться в качестве смещений. Например, хотя координата (-1, 0) не является
+    // допустимой клеткой, ее можно использовать для представления концепции перемещения на 1 клетку влево.
     public struct SCoordinate : IComparable<SCoordinate>
     {
         public readonly int File_Index;

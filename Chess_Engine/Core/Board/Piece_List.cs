@@ -8,9 +8,9 @@ namespace Chess_Engine.Core
 {
     public class APiece_List
     {
-        public int[] Occupied_Squares; // Indices of squares occupied by given piece 
+        public int[] Occupied_Squares; // Индексы клеток, занятых данной фигурой 
 
-        private int[] Map; // Map to go from index of a square, to the index in the Occupied_Squares where that square is stored
+        private int[] Map; // Карта для перехода от индекса клетки к индексу в Occupied_Squares, где хранится эта клетка.
         private int Num_Of_Pieces;
 
         public APiece_List(int max_piece_count = 10)
@@ -19,7 +19,7 @@ namespace Chess_Engine.Core
             Map = new int[64];
             Num_Of_Pieces = 0;
 
-            // Initialize map with -1 (indicating no piece)
+            // Инициализируем карту значением -1 (указывает на отсутствие фигуры)
             for (int i = 0; i < Map.Length; i++)
             {
                 Map[i] = -1;
@@ -38,7 +38,6 @@ namespace Chess_Engine.Core
         {
             if (Num_Of_Pieces >= Occupied_Squares.Length)
             {
-                // Resize array if needed
                 Array.Resize(ref Occupied_Squares, Occupied_Squares.Length * 2);
             }
 
@@ -50,15 +49,18 @@ namespace Chess_Engine.Core
         public void Remove_Piece(int square)
         {
             int piece_index = Map[square];
-            if (piece_index == -1) return; // Piece not found
 
-            // Move last element to the position of the removed element
+            if (piece_index == -1)
+            {// Фигура не найдена
+                return;
+            }
+
+            // Перемещаем последний элемент на позицию удаленного элемента
             Occupied_Squares[piece_index] = Occupied_Squares[Num_Of_Pieces - 1];
 
-            // Update map for the moved element
+            // Обновляем карту для перемещенного элемента
             Map[Occupied_Squares[piece_index]] = piece_index;
 
-            // Clear the removed square in map
             Map[square] = -1;
 
             Num_Of_Pieces--;
@@ -67,11 +69,14 @@ namespace Chess_Engine.Core
         public void Move_Piece(int start_square, int target_square)
         {
             int piece_index = Map[start_square];
-            if (piece_index == -1) return; // Piece not found
+            
+            if (piece_index == -1)
+            {// Фигура не найдена
+                return;
+            }
 
             Occupied_Squares[piece_index] = target_square;
 
-            // Update map - clear old square and set new square
             Map[start_square] = -1;
             Map[target_square] = piece_index;
         }
@@ -93,11 +98,11 @@ namespace Chess_Engine.Core
 
         public void Clear()
         {
-            // Clear all entries in map for currently occupied squares
             for (int i = 0; i < Num_Of_Pieces; i++)
             {
                 Map[Occupied_Squares[i]] = -1;
             }
+
             Num_Of_Pieces = 0;
         }
     }

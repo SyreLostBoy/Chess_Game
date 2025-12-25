@@ -15,9 +15,9 @@ public class AsFen_Utility
     public static string Get_Current_Fen(ABoard board, bool always_include_ep_square = true)
     {
         /// <summary>
-        /// Get the fen string of the current position
-        /// When always_include_ep_square is true the en passant square will be included
-        /// in the fen string even if no enemy pawn is in a position to capture it.
+        /// Возвращает FEN строку текущей позиции
+        // Если always_include_ep_square равно true, то поле en passant будет включено
+        // в FEN строку, даже если ни одна вражеская пешка не находится в позиции для захвата.
         /// </summary>
 
         string fen = Build_Board_Fen(board);
@@ -207,22 +207,22 @@ public readonly struct SPosition_Info
     public readonly string Fen;
     public readonly ReadOnlyCollection<int> Squares;
 
-    // Castling rights
+    // Права рокировок
     public readonly bool White_Castle_Kingside;
     public readonly bool White_Castle_Queenside;
     public readonly bool Black_Castle_Kingside;
     public readonly bool Black_Castle_Queenside;
 
-    // En passant file (1 is a-file, 8 is h-file, 0 means none)
+    // En-passant файл (1 — a-файл, 8 — h-файл, 0 — нет)
     public readonly int Ep_File;
     public readonly bool White_To_Move;
 
-    // Number of half-moves since last capture or pawn advance
-    // (starts at 0 and increments after each player's move)
+    // Количество полуходов с момента последнего взятия или продвижения пешки
+    // (начинается с 0 и увеличивается после каждого хода игрока)
     public readonly int Fifty_Move_Ply_Count;
 
-    // Total number of moves played in the game
-    // (starts at 1 and increments after black's move)
+    // Общее количество ходов, сыгранных в партии
+    // (начинается с 1 и увеличивается после хода черных)
     public readonly int Move_Count;
 
     public SPosition_Info(string fen)
@@ -268,7 +268,6 @@ public readonly struct SPosition_Info
         Black_Castle_Kingside = castling_rights.Contains('k');
         Black_Castle_Queenside = castling_rights.Contains('q');
 
-        // Default values
         Ep_File = 0;
         Fifty_Move_Ply_Count = 0;
         Move_Count = 0;
@@ -282,13 +281,11 @@ public readonly struct SPosition_Info
             }
         }
 
-        // Half-move clock
         if (sections.Length > 4)
         {
             int.TryParse(sections[4], out Fifty_Move_Ply_Count);
         }
 
-        // Full move number
         if (sections.Length > 5)
         {
             int.TryParse(sections[5], out Move_Count);

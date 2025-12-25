@@ -12,7 +12,7 @@ namespace Chess_Engine.Helpers.Bitboard.Magics
     {
         public static ulong[] Create_All_Blocker_Bitboards(ulong movement_mask)
         {
-            // Create a list of the indices of the bits that are set in the movement mask
+            // Создаем список индексов битов, установленных в маске движения
             List<int> move_square_indices = new();
             
             for (int i = 0; i < 64; i++)
@@ -23,11 +23,11 @@ namespace Chess_Engine.Helpers.Bitboard.Magics
                 }
             }
 
-            // Calculate total number of different bitboards (one for each possible arrangement of pieces)
+            // Рассчитываем общее количество различных игровых полей (по одному для каждого возможного расположения фигур)
             int num_patterns = 1 << move_square_indices.Count; // 2^n
             ulong[] blocker_bitboards = new ulong[num_patterns];
 
-            // Create all bitboards
+            // Создаем все битборды
             for (int pattern_index = 0; pattern_index < num_patterns; pattern_index++)
             {
                 for (int bitIndex = 0; bitIndex < move_square_indices.Count; bitIndex++)

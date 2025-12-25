@@ -53,10 +53,9 @@ namespace Chess_Engine.Core
             return Moves_By_Position.ContainsKey(Remove_Move_Counters_From_FEN(position_fen));
         }
 
-        // WeightPow is a value between 0 and 1.
-        // 0 means all moves are picked with equal probablity, 1 means moves are weighted by num times played.
         public bool Try_Get_Book_Move(ABoard board, out string move_string, double weight_pow = 0.5)
-        {
+        {// WeightPow — значение от 0 до 1.
+         // 0 означает, что все ходы выбираются с равной вероятностью, 1 означает, что ходы взвешиваются по количеству сыгранных ходов.
             string position_fen = AsFen_Utility.Get_Current_Fen(board, always_include_ep_square: false);
             weight_pow = Math.Clamp(weight_pow, 0, 1);
             

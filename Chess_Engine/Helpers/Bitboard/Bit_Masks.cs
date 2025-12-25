@@ -3,8 +3,7 @@
 namespace Chess_Engine.Helpers
 {
     public static class AsBit_Masks
-    {// A collection of precomputed bitboards.
-
+    {
         public const ulong File_A = 0x101010101010101;
         public const ulong White_Kingside_Mask = 1UL << AsBoard_Helper.f1 | 1UL << AsBoard_Helper.g1;
         public const ulong Black_Kingside_Mask = 1UL << AsBoard_Helper.f8 | 1UL << AsBoard_Helper.g8;
@@ -29,8 +28,8 @@ namespace Chess_Engine.Helpers
         public static readonly ulong[] White_Forward_File_Mask;
         public static readonly ulong[] Black_Forward_File_Mask;
 
-        public static readonly ulong[] Triple_File_Mask; // Mask of three consecutive files centred at given file index. // For example, given file '3', the mask would contains files [2,3,4].
-    
+        public static readonly ulong[] Triple_File_Mask; // Маска из трех последовательных файлов, центрированных по заданному индексу файла. Например, для файла '3' маска будет содержать файлы [2,3,4].
+
         static AsBit_Masks()
         {
             File_Mask = new ulong[8];

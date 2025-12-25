@@ -165,35 +165,24 @@ namespace Chess_Engine.Core
         private void Generate_Sliding_Moves(Span<SMove> moves)
         {
             ulong move_mask = Empty_Or_Enemy_Squares & Check_Ray_Bitmask & Move_Type_Mask;
-            Generate_Orthogonal_Slider_Moves(move_mask, moves);
-            Generate_Diagonal_Slider_Moves(move_mask, moves);
+
+            Generate_Slider_Moves(move_mask, moves, true);
+            Generate_Slider_Moves(move_mask, moves, false);
         }
 
-        private void Generate_Orthogonal_Slider_Moves(ulong move_mask, Span<SMove> moves)
+        private void Generate_Slider_Moves(ulong move_mask, Span<SMove> moves, bool is_orthogonal)
         {
-            ulong sliders = Board.Friendly_Orthogonal_Sliders;
+            ulong sliders = is_orthogonal ? Board.Friendly_Orthogonal_Sliders : Board.Friendly_Diagonal_Sliders;
 
             if (In_Check)
             {
                 sliders &= ~Pin_Rays;
             }
-
+            
             while (sliders != 0)
             {
                 int start_square = AsBitboard_Utility.Pop_LSB(ref sliders);
-                Generate_Slider_Moves_For_Square(start_square, move_mask, true, moves);
-            }
-        }
-
-        private void Generate_Diagonal_Slider_Moves(ulong move_mask, Span<SMove> moves)
-        {
-            ulong sliders = Board.Friendly_Diagonal_Sliders;
-            if (In_Check) sliders &= ~Pin_Rays;
-
-            while (sliders != 0)
-            {
-                int start_square = AsBitboard_Utility.Pop_LSB(ref sliders);
-                Generate_Slider_Moves_For_Square(start_square, move_mask, false, moves);
+                Generate_Slider_Moves_For_Square(start_square, move_mask, is_orthogonal, moves);
             }
         }
 
@@ -301,7 +290,7 @@ namespace Chess_Engine.Core
 
         private void Generate_Pawn_Captures(ulong pawns, int push_dir, Span<SMove> moves)
         {
-            var (capture_left, capture_right) = Calculate_Pawn_Captures(pawns, push_dir);
+            (ulong capture_left, ulong capture_right) = Calculate_Pawn_Captures(pawns, push_dir);
             ulong promotion_rank_mask = Get_Promotion_Rank_Mask();
 
             Process_Pawn_Captures(capture_left, push_dir * 7, promotion_rank_mask, moves);
@@ -373,10 +362,17 @@ namespace Chess_Engine.Core
 
         private void Generate_En_Passant_Moves(ulong pawns, int push_dir, int push_offset, Span<SMove> moves)
         {
-            if (Board.Current_Game_State.En_Passant_File <= 0) return;
+            if (Board.Current_Game_State.En_Passant_File <= 0)
+            {
+                return;
+            }
 
-            var (target_square, captured_pawn_square) = Calculate_En_Passant_Squares(push_dir, push_offset);
-            if (!AsBitboard_Utility.Contains_Square(Check_Ray_Bitmask, captured_pawn_square)) return;
+            (int target_square, int captured_pawn_square) = Calculate_En_Passant_Squares(push_dir, push_offset);
+
+            if (!AsBitboard_Utility.Contains_Square(Check_Ray_Bitmask, captured_pawn_square))
+            {
+                return;
+            }
 
             ulong pawns_that_can_capture_ep = pawns & AsBitboard_Utility.Get_Pawn_Attacks(1ul << target_square, !Board.Is_White_To_Move);
 
@@ -384,8 +380,7 @@ namespace Chess_Engine.Core
             {
                 int start_square = AsBitboard_Utility.Pop_LSB(ref pawns_that_can_capture_ep);
 
-                if (Can_Pawn_Move_Safely(start_square, target_square) &&
-                    !In_Check_After_En_Passant(start_square, target_square, captured_pawn_square))
+                if (Can_Pawn_Move_Safely(start_square, target_square) && !In_Check_After_En_Passant(start_square, target_square, captured_pawn_square))
                 {
                     moves[Curr_Move_Index++] = new SMove(start_square, target_square, SMove.En_Passant_Capture_Flag);
                 }
@@ -459,10 +454,8 @@ namespace Chess_Engine.Core
 
             Not_Pin_Rays = ~Pin_Rays;
 
-            // Knight attacks
             ulong opponent_knight_attacks = Calculate_Knight_Threats();
 
-            // Pawn attacks
             Calculate_Pawn_Threats(opponent_knight_attacks);
 
             int enemy_king_square = Board.King_Square[Enemy_Index];
