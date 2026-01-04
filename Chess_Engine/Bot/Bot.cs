@@ -2,6 +2,7 @@
 using Chess_Engine.Core;
 using Chess_Engine.Helpers;
 using System.Numerics;
+using System.Reflection;
 
 namespace Chess_Engine
 {
@@ -14,19 +15,16 @@ namespace Chess_Engine
         private ASearcher Searcher;
         private readonly ABoard Board;
         private readonly AOpening_Book Opening_Book;
+        private readonly ADifficulty_Controller Difficulty_Controller;
         private readonly AutoResetEvent Search_Wait_Handle;
         CancellationTokenSource? Cancel_Search_Timer;
 
         private int Current_Search_ID;
         private bool Is_Quitting;
 
-        private ADifficulty_Controller Difficulty_Controller;
-
         // Настройки сложности
         private bool Use_Opening_Book = true;
         private int Max_Book_Ply = 16;
-        //private const bool Use_Max_Think_Time = false;
-        //private const int Max_Think_Time_Ms = 5000;
 
         public ABot()
         {

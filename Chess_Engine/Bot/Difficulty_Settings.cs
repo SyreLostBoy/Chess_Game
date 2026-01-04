@@ -41,7 +41,7 @@ namespace Chess_Engine.Bot
             Use_Opening_Book = true;
             Max_Book_Ply = 16;
             Max_Search_Time_Ms = 5000;
-            Min_Search_Time_Ms = 1000;
+            Min_Search_Time_Ms = 2000;
             Use_Time_Management = true;
         }
 
@@ -65,9 +65,9 @@ namespace Chess_Engine.Bot
                         Skill_Randomness = 0.2f,
                         Use_Opening_Book = true,
                         Max_Book_Ply = 5,
-                        Max_Search_Time_Ms = 2000,
-                        Min_Search_Time_Ms = 500,
-                        Use_Time_Management = false
+                        Max_Search_Time_Ms = 5000,
+                        Min_Search_Time_Ms = 2000,
+                        Use_Time_Management = true
                     };
                 case EDifficulty.Intermediate:
                     return new ADifficulty_Settings
@@ -86,7 +86,7 @@ namespace Chess_Engine.Bot
                         Use_Opening_Book = true,
                         Max_Book_Ply = 16,
                         Max_Search_Time_Ms = 5000,
-                        Min_Search_Time_Ms = 1000,
+                        Min_Search_Time_Ms = 2000,
                         Use_Time_Management = true
                     };
                 case EDifficulty.Advanced:
