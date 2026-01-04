@@ -1,22 +1,19 @@
-﻿using Chess_Engine.Core.Evaluation;
+﻿using Chess_Engine.Bot;
+using Chess_Engine.Core.Evaluation;
 using Chess_Engine.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Chess_Engine.Core
 {
     public class ASearcher
     {
-        private const int Transposition_Table_Size_MB = 64;
         private const int Max_Extensions = 16;
         private const int Immediate_Mate_Score = 100000;
         private const int Positive_Infinity = 9999999;
         private const int Negative_Infinity = -Positive_Infinity;
+
+        //private int Transposition_Table_Size_MB = 64;
+        //private int Max_Search_Depth = 256;
+        public bool Use_Advanced_Search { get;  set;}
 
         public event Action<SMove>? On_Search_Complete;
 
@@ -38,6 +35,7 @@ namespace Chess_Engine.Core
         private System.Diagnostics.Stopwatch Search_Total_Timer;
         public string Debug_Info;
 
+        private ADifficulty_Settings Difficulty_Settings;
         private readonly ATransposition_Table Transposition_Table;
         private readonly ARepetition_Table Repetition_Table;
         private readonly AMove_Generator Move_Generator;
@@ -45,19 +43,30 @@ namespace Chess_Engine.Core
         private readonly AEvaluator Evaluation;
         private readonly ABoard Board;
 
-        public ASearcher(ABoard board)
+        public ASearcher(ABoard board, ADifficulty_Settings difficulty_settings)
         {
             Board = board;
+            Difficulty_Settings = difficulty_settings;
 
             Evaluation = new AEvaluator();
             Move_Generator = new AMove_Generator();
-            Transposition_Table = new ATransposition_Table(Board, Transposition_Table_Size_MB);
+            Transposition_Table = new ATransposition_Table(Board, difficulty_settings.TT_Size_MB);
             Move_Ordering = new AMove_Ordering(Move_Generator, Transposition_Table);
             Repetition_Table = new ARepetition_Table();
 
             Move_Generator.Promotion_Mode = EPromotion_Mode.Queen_And_Knight;
 
             Search(1, 0, Negative_Infinity, Positive_Infinity);
+        }
+
+        public void Update_Difficulty_Settings(ADifficulty_Settings difficulty_settings)
+        {
+            Difficulty_Settings = difficulty_settings;
+
+            if (Transposition_Table != null)
+            {
+                Transposition_Table.Resize(Difficulty_Settings.TT_Size_MB);
+            }
         }
 
         public void Start_Search()
@@ -72,6 +81,7 @@ namespace Chess_Engine.Core
 
             Current_Depth = 0;
             Debug_Info = "Starting search with FEN " + AsFen_Utility.Get_Current_Fen(Board);
+            
             Search_Cancelled = false;
             Search_Diagnostics = new SSearch_Diagnostics();
             Search_Iteration_Timer = new System.Diagnostics.Stopwatch();
@@ -90,7 +100,10 @@ namespace Chess_Engine.Core
 
         private void Run_Iterative_Deepening_Search()
         {
-            for (int search_depth = 1; search_depth <= 256; search_depth++)
+            int start_depth = Difficulty_Settings.Min_Depth;
+            int max_depth = Math.Min(Difficulty_Settings.Max_Depth, 256);
+
+            for (int search_depth = 1; search_depth <= max_depth; search_depth++)
             {
                 Has_Searched_At_Least_One_Move = false;
                 Debug_Info += "\nStarting Iteration: " + search_depth;
@@ -139,7 +152,23 @@ namespace Chess_Engine.Core
                         break;
                     }
                 }
+
+                if (Should_Stop_Early(search_depth))
+                {
+                    Debug_Info += "\nStopping early due to difficulty settings";
+                    break;
+                }
             }
+        }
+
+        public bool Should_Stop_Early(int curre_depth)
+        {
+            if (Difficulty_Settings.Max_Depth <= 5 && Search_Total_Timer.ElapsedMilliseconds > Difficulty_Settings.Max_Search_Time_Ms / 2)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public (SMove move, int eval) Get_Search_Result()
@@ -176,6 +205,7 @@ namespace Chess_Engine.Core
             }
 
             int tt_val = Transposition_Table.Lookup_Evaluation(ply_remaining, ply_from_root, alpha, beta);
+            
             if (tt_val != ATransposition_Table.Lookup_Failed)
             {
                 if (ply_from_root == 0)
@@ -227,6 +257,7 @@ namespace Chess_Engine.Core
                 Board.Make_Move(moves[i], is_search: true);
 
                 int extension = 0;
+                
                 if (num_extensions < Max_Extensions)
                 {
                     EPiece_Type moved_piece_type = APiece.Get_Piece_Type(Board.Square[move.Target_Square]);
@@ -244,17 +275,39 @@ namespace Chess_Engine.Core
 
                 bool needs_full_search = true;
                 int eval = 0;
-                if (extension == 0 && ply_remaining >= 3 && i >= 3 && !is_capture)
-                {
+                
+                if (Difficulty_Settings.Use_LMR && extension == 0 && ply_remaining >= 3 && i >= 3 && !is_capture)
+                {// Late Move Reductions
                     const int reduce_depth = 1;
                     eval = -Search(ply_remaining - 1 - reduce_depth, ply_from_root + 1, -alpha - 1, -alpha, num_extensions, move, is_capture);
                     needs_full_search = eval > alpha;
                 }
 
+                //if (Difficulty_Settings.Use_Null_Move && needs_full_search && !Board.Is_In_Check() && ply_remaining >= 3 && !is_capture)
+                //{// Null Move Pruning
+                //    Board.Make_Null_Move();
+                //    int null_move_reduction = 2 + ply_remaining / 6;
+                //    int null_score = -Search(ply_remaining - 1 - null_move_reduction, ply_from_root + 1, -beta, -beta + 1, num_extensions, move, is_capture);
+                //    Board.Unmake_Null_Move();
+
+                //    if (null_score >= beta)
+                //    {
+                //        Board.Unmake_Move(moves[i], is_search: true);
+
+                //        if (ply_from_root > 0)
+                //        {
+                //            Repetition_Table.Try_Pop();
+                //        }
+
+                //        return beta;
+                //    }
+                //}
+
                 if (needs_full_search)
                 {
                     eval = -Search(ply_remaining - 1 + extension, ply_from_root + 1, -beta, -alpha, num_extensions + extension, move, is_capture);
                 }
+
                 Board.Unmake_Move(moves[i], is_search: true);
 
                 if (Search_Cancelled)
@@ -290,6 +343,7 @@ namespace Chess_Engine.Core
                     best_move_in_this_position = moves[i];
 
                     alpha = eval;
+                    
                     if (ply_from_root == 0)
                     {
                         Best_Move_This_Iteration = moves[i];
@@ -316,8 +370,19 @@ namespace Chess_Engine.Core
                 return 0;
             }
 
-            int eval = Evaluation.Evaluate(Board);
+            int eval;
+
+            if (Difficulty_Settings.Use_Advanced_Eval)
+            {
+                eval = Evaluation.Evaluate(Board);
+            }
+            else
+            {
+                eval = Evaluation.Evaluate_Material_Only(Board, Difficulty_Settings.Contempt_Factor);
+            }
+
             Search_Diagnostics.Num_Positions_Evaluated++;
+            
             if (eval >= beta)
             {
                 Search_Diagnostics.Num_Cut_Offs++;

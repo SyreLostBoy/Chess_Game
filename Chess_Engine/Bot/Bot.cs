@@ -1,4 +1,5 @@
-﻿using Chess_Engine.Core;
+﻿using Chess_Engine.Bot;
+using Chess_Engine.Core;
 using Chess_Engine.Helpers;
 using System.Numerics;
 
@@ -19,15 +20,19 @@ namespace Chess_Engine
         private int Current_Search_ID;
         private bool Is_Quitting;
 
-        private const bool Use_Opening_Book = true;
-        private const int Max_Book_Ply = 16;
-        private const bool Use_Max_Think_Time = false;
-        private const int Max_Think_Time_Ms = 5000;
+        private ADifficulty_Controller Difficulty_Controller;
+
+        // Настройки сложности
+        private bool Use_Opening_Book = true;
+        private int Max_Book_Ply = 16;
+        //private const bool Use_Max_Think_Time = false;
+        //private const int Max_Think_Time_Ms = 5000;
 
         public ABot()
         {
             Board = ABoard.Create_Board();
-            Searcher = new ASearcher(Board);
+            Difficulty_Controller = new ADifficulty_Controller();
+            Searcher = new ASearcher(Board, Difficulty_Controller.Current_Settings);
             Searcher.On_Search_Complete += On_Search_Completed;
 
             Opening_Book = Load_Opening_Book();
@@ -40,7 +45,8 @@ namespace Chess_Engine
         public ABot(ABoard board)
         {
             Board = board;
-            Searcher = new ASearcher(Board);
+            Difficulty_Controller = new ADifficulty_Controller();
+            Searcher = new ASearcher(Board, Difficulty_Controller.Current_Settings);
             Searcher.On_Search_Complete += On_Search_Completed;
             
             Opening_Book = Load_Opening_Book();
@@ -48,6 +54,31 @@ namespace Chess_Engine
             Search_Wait_Handle = new(false);
 
             Task.Factory.StartNew(Search_Thread, TaskCreationOptions.LongRunning);
+        }
+
+        public ABot(ABoard board, ADifficulty_Controller difficulty_controller)
+        {
+            Board = board;
+            Difficulty_Controller = difficulty_controller;
+            Searcher = new ASearcher(Board, Difficulty_Controller.Current_Settings);
+            Searcher.On_Search_Complete += On_Search_Completed;
+
+            Opening_Book = Load_Opening_Book();
+
+            Search_Wait_Handle = new(false);
+
+            Task.Factory.StartNew(Search_Thread, TaskCreationOptions.LongRunning);
+        }
+
+        public void Set_Difficulty(EDifficulty difficulty)
+        {
+            Difficulty_Controller.Set_Difficulty(difficulty);
+            Searcher.Update_Difficulty_Settings(Difficulty_Controller.Current_Settings);
+        }
+
+        public ADifficulty_Settings Get_Current_Difficulty()
+        {
+            return Difficulty_Controller.Current_Settings;
         }
 
         public SMove Get_Best_Move()
@@ -74,22 +105,27 @@ namespace Chess_Engine
 
         public int Choose_Think_Time(int time_remaining_white_ms, int time_remaining_black_ms, int increment_white_ms, int increment_black_ms)
         {
+            ADifficulty_Settings settings = Difficulty_Controller.Current_Settings;
+
+            if (!settings.Use_Time_Management)
+            {
+                return settings.Max_Search_Time_Ms;
+            }
+
             int my_time_remaining_ms = Board.Is_White_To_Move ? time_remaining_white_ms : time_remaining_black_ms;
             int my_increment_ms = Board.Is_White_To_Move ? increment_white_ms : increment_black_ms;
 
             double think_time_ms = my_increment_ms / 40.0;
 
-            if (Use_Max_Think_Time)
-            {
-                think_time_ms = Math.Min(Max_Think_Time_Ms, think_time_ms);
-            }
+            think_time_ms = Math.Min(settings.Max_Search_Time_Ms, think_time_ms);
+
 
             if (my_time_remaining_ms > my_increment_ms * 2)
             {
                 think_time_ms += my_increment_ms * 0.8;
             }
 
-            double min_think_time = Math.Min(50, my_time_remaining_ms * 0.25);
+            double min_think_time = Math.Min(settings.Min_Search_Time_Ms, my_time_remaining_ms * 0.25);
             
             return (int)Math.Ceiling(Math.Max(min_think_time, think_time_ms));
         }
@@ -100,19 +136,31 @@ namespace Chess_Engine
             Is_Thinking = true;
             Cancel_Search_Timer?.Cancel();
 
-            var searchBoard = ABoard.Create_Board(Board.Current_FEN);
-            Searcher = new ASearcher(searchBoard);
+            ABoard search_board = ABoard.Create_Board(Board.Current_FEN);
+            Searcher = new ASearcher(search_board, Difficulty_Controller.Current_Settings);
             Searcher.On_Search_Complete += On_Search_Completed;
 
-            if (Try_Get_Opening_Book_Move(out SMove book_move))
+            Use_Opening_Book = Difficulty_Controller.Current_Settings.Use_Opening_Book;
+            Max_Book_Ply = Difficulty_Controller.Current_Settings.Max_Book_Ply;
+
+            if (Use_Opening_Book && Board.Ply_Count <= Max_Book_Ply)
             {
-                Latest_Move_Is_Book_Move = true;
-                On_Search_Completed(book_move);
+                if (Try_Get_Opening_Book_Move(out SMove book_move))
+                {
+                    Latest_Move_Is_Book_Move = true;
+                    On_Search_Completed(book_move);
+                    return;
+                }
             }
-            else
+
+            int think_time = time_ms;
+
+            if (Difficulty_Controller.Current_Difficulty <= EDifficulty.Intermediate)
             {
-                Start_Search(time_ms);
+                think_time = Math.Min(think_time, Difficulty_Controller.Current_Settings.Max_Search_Time_Ms); ;
             }
+
+            Start_Search(think_time);
         }
 
         public void Stop_Thinking()

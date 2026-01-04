@@ -28,6 +28,7 @@ namespace Chess_Engine.Core.Evaluation
         public int Evaluate(ABoard board)
         {
             Board = board;
+
             White_Eval = new Evaluation_Data();
             Black_Eval = new Evaluation_Data();
 
@@ -56,6 +57,31 @@ namespace Chess_Engine.Core.Evaluation
             return Board.Is_White_To_Move ? total_eval : -total_eval;
         }
 
+        public int Evaluate_Material_Only(ABoard board, int contempt_factor = 0)
+        {
+            Board = board;
+
+            int white_material = Count_Material(ABoard.White_Index);
+            int black_material = Count_Material(ABoard.Black_Index);
+
+            int material_eval = white_material - black_material;
+
+            int contempt_bonus = 0;
+
+            if (material_eval > 0)
+            {
+                contempt_bonus = -contempt_factor;
+            }
+            else if (material_eval < 0)
+            {
+                contempt_bonus = contempt_factor;
+            }
+
+            int total_eval = material_eval + contempt_bonus;
+            
+            return Board.Is_White_To_Move ? total_eval : -total_eval;
+        }
+
         private int Evaluate_King_Pawn_Shield(int color_index, SMaterial_Info enemy_material, float enemy_piece_square_score)
         {
             if (enemy_material.Endgame_Transition >= 1)
@@ -79,6 +105,7 @@ namespace Chess_Engine.Core.Evaluation
                 for (int i = 0; i < squares.Length / 2; i++)
                 {
                     int shield_square_index = squares[i];
+                    
                     if (Board.Square[shield_square_index] != friendly_pawn)
                     {
                         if (squares.Length > 3 && Board.Square[squares[i + 3]] == friendly_pawn)

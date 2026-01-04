@@ -1,13 +1,14 @@
 ﻿using Chess_Engine;
+using Chess_Engine.Bot;
 using Chess_Engine.Core;
 using Chess_Engine.Helpers;
+using Chess_UI.Bot_Controller;
+using Chess_UI.Helpers;
 using Sound_System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chess_UI.Helpers;
-using Chess_UI.Bot_Controller;
 
 namespace Chess_UI
 {
@@ -17,8 +18,9 @@ namespace Chess_UI
         private AMove_Generator Move_Generator;
         private AsSound_System Sound_System;
         private ABot_Controller Bot_Controller;
+        private ADifficulty_Controller Difficulty_Controller;
 
-        private bool Playing_Against_Bot = false;
+        private bool Playing_Against_Bot = true;
         private bool Human_Is_White = true;
         private bool Board_Flipped = true;
 
@@ -67,7 +69,6 @@ namespace Chess_UI
             Move_Generator = new AMove_Generator();
             Sound_System = new AsSound_System();
 
-            Playing_Against_Bot = true;
             Initialize_Bot();
 
             Draw_Board();
@@ -104,8 +105,19 @@ namespace Chess_UI
 
         private void Initialize_Bot()
         {
-            Bot_Controller = new ABot_Controller(Board);
-            Bot_Controller.On_Move_Chosen += On_Bot_Move_Chosen;
+            Difficulty_Controller = new ADifficulty_Controller();
+
+            if (Playing_Against_Bot)
+            {
+                Bot_Controller = new ABot_Controller(Board, Difficulty_Controller);
+                Bot_Controller.On_Move_Chosen += On_Bot_Move_Chosen;
+
+                Set_Bot_Difficulty(EDifficulty.Master); //!!!
+            }
+            else
+            {
+                Bot_Controller = null;
+            }
         }
 
         #region Mouse Event Handlers
@@ -298,6 +310,12 @@ namespace Chess_UI
             {
                 try
                 {
+                    if (!Playing_Against_Bot)
+                    {
+                        Board_Grid.IsEnabled = true;
+                        return;
+                    }
+
                     if (string.IsNullOrEmpty(move_string) || move_string == "null")
                     {
                         Check_Game_State();
@@ -329,7 +347,13 @@ namespace Chess_UI
                     }
 
                     Execute_Move(move);
-                    Board_Grid.IsEnabled = true;
+
+                    // После хода бота, если это режим человек-человек, доска уже включена в Execute_Move
+                    // В режиме человек-бот доска будет включена только если очередь человека
+                    if (!Playing_Against_Bot)
+                    {
+                        Board_Grid.IsEnabled = true;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -339,15 +363,29 @@ namespace Chess_UI
             });
         }
 
+        private void Set_Bot_Difficulty(EDifficulty difficulty)
+        {
+            if (Bot_Controller == null)
+            {
+                return;
+            }
+
+            Bot_Controller.Set_Difficulty(difficulty);
+        }
+
         private void Make_Bot_Move()
         {
-            if (Bot_Controller != null && Playing_Against_Bot)
+            if (Bot_Controller != null && Playing_Against_Bot && !Is_Game_Over())
             {
                 Board_Grid.IsEnabled = false;
                 System.Threading.Tasks.Task.Run(() =>
                 {
                     Bot_Controller.Make_Move();
                 });
+            }
+            else
+            {
+                Board_Grid.IsEnabled = true;
             }
         }
 
@@ -369,6 +407,14 @@ namespace Chess_UI
                 {
                     Make_Bot_Move();
                 }
+                else
+                {
+                    Board_Grid.IsEnabled = true;
+                }
+            }
+            else if (!Playing_Against_Bot)
+            {
+                Board_Grid.IsEnabled = true;
             }
         }
 
@@ -552,12 +598,32 @@ namespace Chess_UI
 
             if (Playing_Against_Bot)
             {
-                bool bot_should_move = (Human_Is_White && !Board.Is_White_To_Move) || (!Human_Is_White && Board.Is_White_To_Move);
+                // Уничтожаем старый контроллер бота если был
+                Bot_Controller?.Dispose();
+                Bot_Controller = null;
+
+                // Инициализируем бота
+                Initialize_Bot();
+
+                bool bot_should_move = (!Human_Is_White && Board.Is_White_To_Move) || (Human_Is_White && !Board.Is_White_To_Move);
 
                 if (bot_should_move)
                 {
-                    Make_Bot_Move();
+                    Board_Grid.IsEnabled = false;
+                    
+                    System.Threading.Tasks.Task.Run(() =>
+                    {
+                        Bot_Controller?.Make_Move();
+                    });
                 }
+                else
+                {
+                    Board_Grid.IsEnabled = true;
+                }
+            }
+            else
+            {
+                Board_Grid.IsEnabled = true;
             }
         }
 

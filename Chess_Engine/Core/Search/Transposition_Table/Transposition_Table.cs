@@ -11,8 +11,9 @@ namespace Chess_Engine.Core
         public const int Lookup_Failed = -1;
 
         public STT_Entry[] Entries;
+        private ulong Size_Mask;
 
-        public readonly ulong Count;
+        public ulong Count;
         public bool Enabled = true;
         ABoard Board;
 
@@ -39,6 +40,44 @@ namespace Chess_Engine.Core
             {
                 Entries[i] = new STT_Entry();
             }
+        }
+
+        public void Resize(int size_MB)
+        {
+            size_MB = Math.Clamp(size_MB, 1, 512); // От 1 МБ до 512 МБ
+
+            int tt_entry_size_bytes = STT_Entry.Get_Size();
+            int desired_table_size_bytes = size_MB * 1024 * 1024;
+
+            // Вычисляем оптимальное количество записей (ближайшая степень двойки)
+            int raw_num_entries = desired_table_size_bytes / tt_entry_size_bytes;
+
+            // Находим ближайшую степень двойки (для эффективного вычисления индекса через & вместо %)
+            int powerOfTwo = 1;
+            
+            while (powerOfTwo * 2 <= raw_num_entries && powerOfTwo * 2 > 0)
+            {
+                powerOfTwo *= 2;
+            }
+
+            int num_entries = powerOfTwo;
+
+            // Сохраняем старые записи если они есть
+            STT_Entry[] oldEntries = null;
+            if (Entries != null)
+            {
+                oldEntries = Entries;
+            }
+
+            // Создаем новую таблицу
+            Count = (ulong)num_entries;
+            Size_Mask = Count - 1;
+            Entries = new STT_Entry[num_entries];
+
+            // Очищаем новую таблицу
+            Clear();
+
+            Console.WriteLine($"Transposition table resized to {num_entries} entries ({size_MB} MB)");
         }
 
         public ulong Index
