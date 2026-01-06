@@ -34,8 +34,9 @@
                                  RenderOptions.BitmapScalingMode="HighQuality"/>
 
                     <ContentControl x:Name="Menu_Container"/>
-                    <Grid x:Name="MainMenu_Container" Grid.Row="0" Grid.RowSpan="2">
-                    </Grid>
+
+                    <ContentControl x:Name="Main_Menu_Container" 
+                    Panel.ZIndex="1000"/>
                 </Grid>
             </Grid>
 

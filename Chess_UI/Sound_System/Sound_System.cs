@@ -7,9 +7,12 @@ namespace Sound_System
 {
     public class AsSound_System
     {
-        public readonly static string Audio_Base_Path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Audio");
+        public bool Enabled { get; set; }
 
+        public readonly static string Audio_Base_Path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Audio");
+        
         private SoundPlayer Player;
+
 
 
         public AsSound_System()

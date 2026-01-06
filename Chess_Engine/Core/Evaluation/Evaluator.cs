@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Chess_Engine.Core.Evaluation
 {
+
     public class AEvaluator
     {
         public const int Pawn_Value = 100;
@@ -22,15 +23,15 @@ namespace Chess_Engine.Core.Evaluation
         private const float Endgame_Material_Start = Rook_Value * 2 + Bishop_Value + Knight_Value;
         private ABoard Board;
 
-        public Evaluation_Data White_Eval;
-        public Evaluation_Data Black_Eval;
+        public SEvaluation_Data White_Eval;
+        public SEvaluation_Data Black_Eval;
 
         public int Evaluate(ABoard board)
         {
             Board = board;
 
-            White_Eval = new Evaluation_Data();
-            Black_Eval = new Evaluation_Data();
+            White_Eval = new SEvaluation_Data();
+            Black_Eval = new SEvaluation_Data();
 
             SMaterial_Info white_material = Get_Material_Info(ABoard.White_Index);
             SMaterial_Info black_material = Get_Material_Info(ABoard.Black_Index);
@@ -185,7 +186,12 @@ namespace Chess_Engine.Core.Evaluation
                 }
             }
 
-            return bonus + Isolated_Pawn_Penalty_By_Count[num_isolated_pawns];
+            if (num_isolated_pawns >= 0 && num_isolated_pawns < Isolated_Pawn_Penalty_By_Count.Length)
+            {
+                return bonus + Isolated_Pawn_Penalty_By_Count[num_isolated_pawns];
+            }
+
+            return bonus;
         }
 
         private int Mop_Up_Evaluation(bool is_white, SMaterial_Info my_material, SMaterial_Info enemy_material)
@@ -268,7 +274,7 @@ namespace Chess_Engine.Core.Evaluation
             return new SMaterial_Info(num_pawns, num_knights, num_bishops, num_queens, num_rooks, my_pawns, enemy_pawns);
         }
 
-        public struct Evaluation_Data
+        public struct SEvaluation_Data
         {
             public int Material_Score;
             public int Mop_Up_Score;

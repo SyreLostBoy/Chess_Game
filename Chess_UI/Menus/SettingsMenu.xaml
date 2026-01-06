@@ -1,0 +1,108 @@
+﻿<UserControl x:Class="Chess_UI.SettingsMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Chess_UI"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Border Style="{StaticResource Border_Style}" Width="350" Height="450">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="60"/>
+            </Grid.RowDefinitions>
+
+            <!-- Заголовок -->
+            <TextBlock Grid.Row="0" 
+                       Text="НАСТРОЙКИ" 
+                       Style="{StaticResource Text_Style}"
+                       FontSize="28"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"/>
+
+            <!-- Настройки -->
+            <ScrollViewer Grid.Row="1" Margin="20">
+                <StackPanel>
+                    <!-- Громкость -->
+                    <StackPanel Margin="0,0,0,15">
+                        <TextBlock Text="ГРОМКОСТЬ ЗВУКА" 
+                                   Style="{StaticResource Text_Style}"
+                                   FontSize="16"/>
+                        <Slider x:Name="VolumeSlider" 
+                                Minimum="0" 
+                                Maximum="100" 
+                                Value="80"
+                                Width="200"
+                                Margin="0,5"/>
+                    </StackPanel>
+
+                    <!-- Графика -->
+                    <StackPanel Margin="0,0,0,15">
+                        <TextBlock Text="КАЧЕСТВО ГРАФИКИ" 
+                                   Style="{StaticResource Text_Style}"
+                                   FontSize="16"/>
+                        <ComboBox x:Name="GraphicsComboBox"
+                                  Width="200"
+                                  Height="30"
+                                  Style="{StaticResource ComboBoxStyle}">
+                            <ComboBoxItem Content="Низкое"/>
+                            <ComboBoxItem Content="Среднее" IsSelected="True"/>
+                            <ComboBoxItem Content="Высокое"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- Шахматные наборы -->
+                    <StackPanel Margin="0,0,0,15">
+                        <TextBlock Text="НАБОР ФИГУР" 
+                                   Style="{StaticResource Text_Style}"
+                                   FontSize="16"/>
+                        <ComboBox x:Name="PieceSetComboBox"
+                                  Width="200"
+                                  Height="30"
+                                  Style="{StaticResource ComboBoxStyle}">
+                            <ComboBoxItem Content="Классический" IsSelected="True"/>
+                            <ComboBoxItem Content="Современный"/>
+                            <ComboBoxItem Content="Деревянный"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- Доска -->
+                    <StackPanel Margin="0,0,0,15">
+                        <TextBlock Text="СТИЛЬ ДОСКИ" 
+                                   Style="{StaticResource Text_Style}"
+                                   FontSize="16"/>
+                        <ComboBox x:Name="BoardStyleComboBox"
+                                  Width="200"
+                                  Height="30"
+                                  Style="{StaticResource ComboBoxStyle}">
+                            <ComboBoxItem Content="Классическая" IsSelected="True"/>
+                            <ComboBoxItem Content="Тёмная"/>
+                            <ComboBoxItem Content="Зелёная"/>
+                        </ComboBox>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Кнопки -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="SaveButton" 
+                        Content="СОХРАНИТЬ" 
+                        Width="120"
+                        Height="35"
+                        Style="{StaticResource Button_Style}"
+                        Click="SaveButton_Click"
+                        Margin="10,0"/>
+
+                <Button x:Name="BackButton" 
+                        Content="НАЗАД" 
+                        Width="100"
+                        Height="35"
+                        Style="{StaticResource Button_Style}"
+                        Click="BackButton_Click"
+                        Margin="10,0"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

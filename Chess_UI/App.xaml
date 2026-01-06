@@ -8,6 +8,8 @@
         <SolidColorBrush x:Key="Fill_Color">#cc380404</SolidColorBrush>
         <SolidColorBrush x:Key="Text_Color">#ffa274</SolidColorBrush>
         <SolidColorBrush x:Key="Button_Color">#730909</SolidColorBrush>
+        <SolidColorBrush x:Key="Hover_Color">#8a0b0b</SolidColorBrush>
+        <SolidColorBrush x:Key="ComboBox_Bg">#5c0707</SolidColorBrush>
 
         <Style TargetType="Border" x:Key="Border_Style">
             <Setter Property="BorderThickness" Value="4"/>
@@ -23,18 +25,71 @@
             <Setter Property="Foreground" Value="{StaticResource Text_Color}"/>
         </Style>
 
+        <!-- Простой стиль Button -->
         <Style TargetType="Button" x:Key="Button_Style">
             <Setter Property="FontFamily" Value="Segoe UI Light"/>
             <Setter Property="FontSize" Value="14"/>
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="BorderBrush" Value="{StaticResource Stroke_Color}"/>
+            <Setter Property="Padding" Value="10,5"/>
             <Setter Property="Background" Value="{StaticResource Button_Color}"/>
             <Setter Property="Foreground" Value="{StaticResource Text_Color}"/>
-            <Style.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="5"/>
-                </Style>
-            </Style.Resources>
+            <Setter Property="BorderBrush" Value="{StaticResource Stroke_Color}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource Hover_Color}"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
+
+        <!-- Простой стиль RadioButton -->
+        <Style TargetType="RadioButton" x:Key="RadioButtonStyle">
+            <Setter Property="Foreground" Value="{StaticResource Text_Color}"/>
+            <Setter Property="FontFamily" Value="Segoe UI Light"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- Простой стиль CheckBox -->
+        <Style TargetType="CheckBox" x:Key="CheckBoxStyle">
+            <Setter Property="Foreground" Value="{StaticResource Text_Color}"/>
+            <Setter Property="FontFamily" Value="Segoe UI Light"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- Простой стиль ComboBox -->
+        <Style TargetType="ComboBox" x:Key="ComboBoxStyle">
+            <Setter Property="Background" Value="{StaticResource Button_Color}"/>
+            <Setter Property="Foreground" Value="{StaticResource Stroke_Color}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Stroke_Color}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="FontFamily" Value="Segoe UI Light"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- Стиль для ComboBoxItem -->
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="{StaticResource Text_Color}"/>
+            <Setter Property="Background" Value="{StaticResource Button_Color}"/>
+            <Setter Property="FontFamily" Value="Segoe UI Light"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="6,3"/>
+            <Style.Triggers>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="Background" Value="{StaticResource Hover_Color}"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{StaticResource Hover_Color}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
     </Application.Resources>
 </Application>

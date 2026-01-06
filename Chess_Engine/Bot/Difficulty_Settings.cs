@@ -63,8 +63,8 @@ namespace Chess_Engine.Bot
                         Move_Ordering_Quality = 1,
                         Contempt_Factor = 50,
                         Skill_Randomness = 0.2f,
-                        Use_Opening_Book = true,
-                        Max_Book_Ply = 5,
+                        Use_Opening_Book = false,
+                        Max_Book_Ply = 0,
                         Max_Search_Time_Ms = 5000,
                         Min_Search_Time_Ms = 2000,
                         Use_Time_Management = true

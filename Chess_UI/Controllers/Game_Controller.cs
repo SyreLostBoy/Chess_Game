@@ -103,11 +103,9 @@ namespace Chess_UI.Game_Controller
 
         public bool Is_Legal_Move(SMove move)
         {
-            var moves = Move_Generator.Generate_Moves(Board);
+            Span<SMove> moves = Move_Generator.Generate_Moves(Board);
 
-            return moves.ToArray().Any(m => m.Start_Square == move.Start_Square &&
-                m.Target_Square == move.Target_Square &&
-                m.Move_Flag == move.Move_Flag);
+            return moves.ToArray().Any(m => m.Start_Square == move.Start_Square && m.Target_Square == move.Target_Square && m.Move_Flag == move.Move_Flag);
         }
 
         public IEnumerable<SMove> Get_Legal_Moves_For_Square(int square)
@@ -120,7 +118,9 @@ namespace Chess_UI.Game_Controller
         public bool Should_Bot_Move()
         {
             if (!Playing_Against_Bot || Is_Game_Over())
+            {
                 return false;
+            }
 
             bool white_to_move = Board.Is_White_To_Move;
             return (Human_Is_White && !white_to_move) || (!Human_Is_White && white_to_move);
@@ -161,7 +161,9 @@ namespace Chess_UI.Game_Controller
         public int Get_Check_King_Square()
         {
             if (!Board.Is_In_Check())
+            {
                 return -1;
+            }
 
             return Board.Is_White_To_Move ? Board.King_Square[ABoard.White_Index] : Board.King_Square[ABoard.Black_Index];
         }
@@ -169,6 +171,11 @@ namespace Chess_UI.Game_Controller
         public string Get_Current_FEN()
         {
             return Board.Current_FEN;
+        }
+
+        public void Set_Sound_System_Enabled(bool enabled)
+        {
+            Sound_System.Enabled = enabled;
         }
 
         public void Dispose()
@@ -179,14 +186,17 @@ namespace Chess_UI.Game_Controller
         private void Make_Bot_Move()
         {
             if (Bot_Controller != null && Should_Bot_Move())
-
-            Task.Run(() => Bot_Controller?.Make_Move());
+            {
+                Task.Run(() => Bot_Controller?.Make_Move());
+            }
         }
 
         private void Handle_Bot_Move(string move_string)
         {
             if (string.IsNullOrEmpty(move_string) || move_string == "null")
+            {
                 return;
+            }
 
             SMove move = AsMove_Utility.Get_Move_From_UCI_Name(move_string, Board);
             

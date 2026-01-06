@@ -1,17 +1,11 @@
-﻿using Chess_Engine;
-using Chess_Engine.Bot;
-using Chess_Engine.Core;
-using Chess_Engine.Helpers;
+﻿using Chess_Engine.Core;
 using Chess_UI.Board_Renderer;
-using Chess_UI.Bot_Controller;
 using Chess_UI.Game_Controller;
 using Chess_UI.Helpers;
-using Sound_System;
-using System.Net;
+using Chess_UI.Menus;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace Chess_UI
 {
@@ -19,6 +13,7 @@ namespace Chess_UI
     {
         private AsGame_Controller Game_Controller;
         private AsBoard_Renderer Board_Renderer;
+        private AsMain_Menu Main_Menu;
 
         private bool Is_Dragging = false;
         private Image Dragged_Piece, Dragged_Piece_Clone;
@@ -48,8 +43,76 @@ namespace Chess_UI
             Game_Controller.On_Game_Ended += On_Game_Ended;
             Game_Controller.On_Board_Enabled_Changed += On_Board_Enabled_Changed;
 
-            Start_New_Game(true, true);
-            //Set_Bot_Difficulty(EDifficulty.Master);
+            Show_Main_Menu();
+        }
+
+        private void Show_Main_Menu()
+        {
+            Main_Menu = new AsMain_Menu();
+            Main_Menu.On_Game_Started += Handle_Game_Started;
+            Main_Menu.On_Show_Settings += Show_Settings_Menu;
+            Main_Menu.On_Exit += On_Exit_Game;
+
+            Main_Menu_Container.Content = Main_Menu;
+        }
+
+        private void Handle_Game_Started(SGame_Settings settings)
+        {
+            Apply_Game_Settings(settings);
+
+            Main_Menu_Container.Content = null;
+
+            Start_Game_With_Settings(settings);
+        }
+
+        private void Apply_Game_Settings(SGame_Settings settings)
+        {
+            Game_Controller.Set_Sound_System_Enabled(true);
+
+            //Board_Renderer.Set_Highlight_Enabled(settings.Additional_Settings.Highlight_Moves);
+
+            if (settings.Game_Mode != EGame_Mode.Human_Vs_Human)
+            {
+                Game_Controller.Set_Bot_Difficulty(settings.Bot_Difficulty);
+            }
+        }
+
+        private void Start_Game_With_Settings(SGame_Settings settings)
+        {
+            bool playing_against_bot = settings.Game_Mode != EGame_Mode.Human_Vs_Human;
+            bool bot_vs_bot = settings.Game_Mode == EGame_Mode.Bot_Vs_Bot;
+            bool human_is_white = true;
+
+            if (settings.Player_Is_White.HasValue)
+            {
+                human_is_white = settings.Player_Is_White.Value;
+            }
+            else
+            {
+                Random rand = new Random();
+                human_is_white = rand.Next(0, 2) == 0;
+            }
+
+            if (bot_vs_bot)
+            {
+                Start_Bot_Vs_Bot_Game();
+            }
+            else
+            {
+                Start_New_Game(playing_against_bot, human_is_white);
+            }
+        }
+
+        private void Start_Bot_Vs_Bot_Game()
+        {//!!! Надо сделать
+            throw new Exception();
+        }
+
+        private void Show_Settings_Menu()
+        {
+            SettingsMenu settings_menu = new SettingsMenu();
+            settings_menu.On_Back += () => Show_Main_Menu();
+            Main_Menu_Container.Content = settings_menu;
         }
 
         private void Initialize_Drag_Canvas()
@@ -109,7 +172,10 @@ namespace Chess_UI
         #region Обработчики мыши
         private void On_Board_Grid_Mouse_Down(object sender, MouseButtonEventArgs e)
         {
-            if (!Board_Grid.IsEnabled || Is_Menu_On_Screen()) return;
+            if (!Board_Grid.IsEnabled || Is_Menu_On_Screen() )
+            {
+                return;
+            }
 
             Point point = e.GetPosition(Board_Grid);
             int square = AsCoordinate_Helper.Get_Square_From_Position(point, Board_Grid.ActualWidth, Board_Renderer.Is_Board_Flipped);
@@ -198,7 +264,10 @@ namespace Chess_UI
 
         private void Continue_Dragging(Point current_point)
         {
-            if (Dragged_Piece_Clone == null) return;
+            if (Dragged_Piece_Clone == null)
+            {
+                return;
+            }
 
             Canvas.SetLeft(Dragged_Piece_Clone, current_point.X - Drag_Piece_Offset);
             Canvas.SetTop(Dragged_Piece_Clone, current_point.Y - Drag_Piece_Offset);
@@ -280,7 +349,10 @@ namespace Chess_UI
         private Image Get_Image_By_Index(int index)
         {
             if (Piece_Grid.Children.Count > index && Piece_Grid.Children[index] is Image image)
+            {
                 return image;
+            }
+
             return null;
         }
 
@@ -294,26 +366,6 @@ namespace Chess_UI
             }
         }
 
-        private void New_Game_Human_VS_Human_Click()
-        {
-            Start_New_Game(false, true);
-        }
-
-        private void New_Game_Human_White()
-        {
-            Start_New_Game(true, true);
-        }
-
-        private void New_Game_Human_Black_Click()
-        {
-            Start_New_Game(true, false);
-        }
-
-        private void Set_Bot_Difficulty(EDifficulty difficulty)
-        {
-            Game_Controller.Set_Bot_Difficulty(difficulty);
-        }
-
         private void Handle_Promotion(int from_square, int to_square)
         {
             Show_Promotion_Menu(from_square, to_square);
@@ -321,7 +373,7 @@ namespace Chess_UI
 
         private void Show_Promotion_Menu(int pawn_square, int target_square)
         {
-            var promotion_menu = new Promotion_Menu(Game_Controller.Board.Is_White_To_Move);
+            Promotion_Menu promotion_menu = new Promotion_Menu(Game_Controller.Board.Is_White_To_Move);
             
             promotion_menu.OnPieceSelected += (piece_type) =>
             {
@@ -334,7 +386,7 @@ namespace Chess_UI
         public void Complete_Promotion_Move(int from_square, int to_square, EPiece_Type promotion_type)
         {
             int flag = Get_Promotion_Flag(promotion_type);
-            var promotion_move = new SMove(from_square, to_square, flag);
+            SMove promotion_move = new SMove(from_square, to_square, flag);
 
             Game_Controller.Try_Make_Move(promotion_move);
             Menu_Container.Content = null;
@@ -342,19 +394,19 @@ namespace Chess_UI
 
         private int Get_Promotion_Flag(EPiece_Type piece_type)
         {
-            return piece_type switch
+            switch (piece_type)
             {
-                EPiece_Type.Queen => SMove.Promote_To_Queen_Flag,
-                EPiece_Type.Rook => SMove.Promote_To_Rook_Flag,
-                EPiece_Type.Bishop => SMove.Promote_To_Bishop_Flag,
-                EPiece_Type.Knight => SMove.Promote_To_Knight_Flag,
-                _ => SMove.Promote_To_Queen_Flag
-            };
+                case EPiece_Type.Queen: return SMove.Promote_To_Queen_Flag;
+                case EPiece_Type.Rook: return SMove.Promote_To_Rook_Flag;
+                case EPiece_Type.Bishop: return SMove.Promote_To_Bishop_Flag;
+                case EPiece_Type.Knight: return SMove.Promote_To_Knight_Flag;
+                default: return SMove.Promote_To_Queen_Flag;
+            }
         }
 
         private void Show_Pause_Menu()
         {
-            var pause_menu = new PauseMenu();
+            PauseMenu pause_menu = new PauseMenu();
             pause_menu.OnContinue += On_Continue_Game;
             pause_menu.OnRestart += On_Restart_Game;
             Menu_Container.Content = pause_menu;
@@ -362,7 +414,7 @@ namespace Chess_UI
 
         private void Show_Game_Over_Menu(EGame_Result result)
         {
-            var game_over_menu = new Game_Over_Menu();
+            Game_Over_Menu game_over_menu = new Game_Over_Menu();
             game_over_menu.SetResult(result);
             game_over_menu.OnRestart += On_Restart_Game;
             game_over_menu.OnExit += On_Exit_Game;
