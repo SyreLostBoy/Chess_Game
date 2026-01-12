@@ -2,7 +2,9 @@
 using Chess_Engine.Core;
 using Chess_Engine.Helpers;
 using Chess_UI.Bot_Controller;
+using Chess_UI.Menus;
 using Sound_System;
+using System.Windows;
 
 
 namespace Chess_UI.Game_Controller
@@ -18,9 +20,15 @@ namespace Chess_UI.Game_Controller
         public bool Human_Is_White { get; private set; }
         public bool Is_Board_Enabled { get; private set; } = true;
 
+        public SGame_Settings Current_Settings { get; private set; }
+        private Timer Bot_Moves_Gap_Timer;
+        private const int Move_Delay_Ms = 1000;
+
         public event Action<SMove> On_Move_Made;
         public event Action<EGame_Result> On_Game_Ended;
         public event Action<bool> On_Board_Enabled_Changed;
+        public event Action On_Bot_Vs_Bot_Started;
+        public event Action On_Bot_Vs_Bot_Stopped;
 
         public AsGame_Controller()
         {
@@ -34,38 +42,97 @@ namespace Chess_UI.Game_Controller
         {
             Bot_Controller = new ABot_Controller(Board, Difficulty_Controller);
             Bot_Controller.On_Move_Chosen += Handle_Bot_Move;
+
+            if (Current_Settings.Game_Mode != EGame_Mode.Human_Vs_Human)
+            {
+                Bot_Controller.Set_Difficulty(Current_Settings.Bot_Difficulty);
+            }
         }
 
-        public void Start_New_Game(bool playing_against_bot, bool human_is_white)
+        public void Start_New_Game(SGame_Settings settings)
         {
-            Playing_Against_Bot = playing_against_bot;
-            Human_Is_White = human_is_white;
+            Current_Settings = settings;
+
+            Playing_Against_Bot = settings.Game_Mode != EGame_Mode.Human_Vs_Human;
+
+            if (settings.Game_Mode == EGame_Mode.Human_Vs_Bot)
+            {
+                Human_Is_White = settings.Player_Is_White ?? new Random().Next(0, 2) == 0;
+            }
+            else
+            {
+                Human_Is_White = true; // Для других режимов неважно
+            }
 
             Board.Load_Start_Position();
+            Apply_Settings(settings);
 
             if (Playing_Against_Bot)
             {
                 if (Bot_Controller == null)
                     Initialize_Bot();
 
-                Bot_Controller.Set_Difficulty(Difficulty_Controller.Current_Difficulty);
-
-                bool bot_should_move_first = (Human_Is_White && !Board.Is_White_To_Move) || (!Human_Is_White && Board.Is_White_To_Move);
-
-                if (bot_should_move_first)
+                if (Current_Settings.Game_Mode == EGame_Mode.Bot_Vs_Bot)
                 {
                     Set_Board_Enabled(false);
-                    Make_Bot_Move();
+                    Start_Bot_Vs_Bot_Game();
+                    On_Bot_Vs_Bot_Started?.Invoke();
                 }
                 else
                 {
-                    Set_Board_Enabled(true);
+                    bool bot_should_move_first = (Human_Is_White && !Board.Is_White_To_Move) || (!Human_Is_White && Board.Is_White_To_Move);
+
+                    if (bot_should_move_first)
+                    {
+                        Set_Board_Enabled(false);
+                        Make_Bot_Move();
+                    }
+                    else
+                    {
+                        Set_Board_Enabled(true);
+                    }
                 }
+                
             }
             else
             {
                 Set_Board_Enabled(true);
             }
+        }
+
+        private void Start_Bot_Vs_Bot_Game()
+        {
+            Bot_Moves_Gap_Timer?.Dispose();
+
+            if (Is_Game_Over())
+            {
+                return;
+            }
+
+            Bot_Moves_Gap_Timer = new Timer(Bot_Vs_Bot_Timer_Callback, null, Move_Delay_Ms, Timeout.Infinite);
+        }
+
+        private void Bot_Vs_Bot_Timer_Callback(object state)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (Current_Settings.Game_Mode != EGame_Mode.Bot_Vs_Bot || Is_Game_Over())
+                {
+                    Bot_Moves_Gap_Timer?.Dispose();
+                    Bot_Moves_Gap_Timer = null;
+                    return;
+                }
+
+                if (Bot_Controller != null)
+                {
+                    Bot_Controller.Make_Move();
+                }
+
+                if (Bot_Moves_Gap_Timer != null && !Is_Game_Over())
+                {
+                    Bot_Moves_Gap_Timer.Change(Move_Delay_Ms, Timeout.Infinite);
+                }
+            });
         }
 
         public bool Try_Make_Move(SMove move)
@@ -83,7 +150,15 @@ namespace Chess_UI.Game_Controller
             On_Move_Made?.Invoke(move);
             Check_Game_State();
 
-            if (Playing_Against_Bot && !Is_Game_Over() )
+            if (Current_Settings.Game_Mode == EGame_Mode.Bot_Vs_Bot || Is_Game_Over())
+            {
+                if (Bot_Moves_Gap_Timer == null)
+                {
+                    Start_Bot_Vs_Bot_Game();
+                }
+            }
+
+            if (Playing_Against_Bot && Current_Settings.Game_Mode != EGame_Mode.Bot_Vs_Bot && !Is_Game_Over() )
             {
                 bool bot_should_move = Should_Bot_Move();
 
@@ -122,8 +197,26 @@ namespace Chess_UI.Game_Controller
                 return false;
             }
 
+            if (Current_Settings.Game_Mode == EGame_Mode.Bot_Vs_Bot)
+            {// Управление через таймер
+                return false; 
+            }
+
             bool white_to_move = Board.Is_White_To_Move;
             return (Human_Is_White && !white_to_move) || (!Human_Is_White && white_to_move);
+        }
+
+        public void Apply_Settings(SGame_Settings settings)
+        {
+            Current_Settings = settings;
+            Sound_System.Enabled = settings.Additional_Settings.Enable_Sound;
+
+            if (settings.Game_Mode != EGame_Mode.Human_Vs_Human && Bot_Controller != null)
+            {
+                Bot_Controller.Set_Difficulty(settings.Bot_Difficulty);
+            }
+
+            Difficulty_Controller.Set_Difficulty(settings.Bot_Difficulty);
         }
 
         public bool Is_Game_Over()
@@ -209,6 +302,12 @@ namespace Chess_UI.Game_Controller
             
             if (game_state != EGame_Result.In_Progress)
             {
+                if (Current_Settings.Game_Mode == EGame_Mode.Bot_Vs_Bot)
+                { 
+                    Bot_Moves_Gap_Timer?.Dispose();
+                    Bot_Moves_Gap_Timer = null;
+                }
+
                 On_Game_Ended?.Invoke(game_state);
                 On_Board_Enabled_Changed?.Invoke(false);
             }

@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
 
-    <Border Style="{StaticResource Border_Style}" Width="450" Height="550">
+    <Border Style="{StaticResource Border_Style}" Width="450" Height="570">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="80"/>
@@ -157,15 +157,9 @@
                                   IsChecked="True"
                                   Style="{StaticResource CheckBoxStyle}"
                                   Margin="0,5"/>
-                        
+
                         <CheckBox x:Name="ShowLegalMovesCheckBox" 
                                   Content="Показывать легальные ходы" 
-                                  IsChecked="True"
-                                  Style="{StaticResource CheckBoxStyle}"
-                                  Margin="0,5"/>
-                        
-                        <CheckBox x:Name="AnimateMovesCheckBox" 
-                                  Content="Анимация ходов" 
                                   IsChecked="True"
                                   Style="{StaticResource CheckBoxStyle}"
                                   Margin="0,5"/>
@@ -174,7 +168,7 @@
             </Grid>
 
             <!-- Кнопки -->
-            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="2">
                 <Button x:Name="StartButton" 
                         Content="НАЧАТЬ ИГРУ" 
                         Width="150"

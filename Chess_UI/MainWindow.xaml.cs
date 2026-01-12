@@ -14,6 +14,7 @@ namespace Chess_UI
         private AsGame_Controller Game_Controller;
         private AsBoard_Renderer Board_Renderer;
         private AsMain_Menu Main_Menu;
+        private SGame_Settings Current_Game_Settings;
 
         private bool Is_Dragging = false;
         private Image Dragged_Piece, Dragged_Piece_Clone;
@@ -58,54 +59,18 @@ namespace Chess_UI
 
         private void Handle_Game_Started(SGame_Settings settings)
         {
-            Apply_Game_Settings(settings);
-
             Main_Menu_Container.Content = null;
 
-            Start_Game_With_Settings(settings);
-        }
+            Game_Controller.Start_New_Game(settings);
 
-        private void Apply_Game_Settings(SGame_Settings settings)
-        {
-            Game_Controller.Set_Sound_System_Enabled(true);
-
-            //Board_Renderer.Set_Highlight_Enabled(settings.Additional_Settings.Highlight_Moves);
-
-            if (settings.Game_Mode != EGame_Mode.Human_Vs_Human)
+            if (settings.Game_Mode == EGame_Mode.Human_Vs_Bot)
             {
-                Game_Controller.Set_Bot_Difficulty(settings.Bot_Difficulty);
-            }
-        }
-
-        private void Start_Game_With_Settings(SGame_Settings settings)
-        {
-            bool playing_against_bot = settings.Game_Mode != EGame_Mode.Human_Vs_Human;
-            bool bot_vs_bot = settings.Game_Mode == EGame_Mode.Bot_Vs_Bot;
-            bool human_is_white = true;
-
-            if (settings.Player_Is_White.HasValue)
-            {
-                human_is_white = settings.Player_Is_White.Value;
-            }
-            else
-            {
-                Random rand = new Random();
-                human_is_white = rand.Next(0, 2) == 0;
+                bool human_is_white = settings.Player_Is_White ?? true;
+                Board_Renderer.Flip_Board(!human_is_white);
             }
 
-            if (bot_vs_bot)
-            {
-                Start_Bot_Vs_Bot_Game();
-            }
-            else
-            {
-                Start_New_Game(playing_against_bot, human_is_white);
-            }
-        }
-
-        private void Start_Bot_Vs_Bot_Game()
-        {//!!! Надо сделать
-            throw new Exception();
+            Clear_Selection();
+            Board_Renderer.Draw_Board(Game_Controller.Board);
         }
 
         private void Show_Settings_Menu()
@@ -120,15 +85,6 @@ namespace Chess_UI
             Drag_Canvas = new Canvas();
             Drag_Canvas.IsHitTestVisible = false;
             Board_Grid.Children.Add(Drag_Canvas);
-        }
-
-        private void Start_New_Game(bool playing_against_bot, bool human_is_white)
-        {
-            Game_Controller.Start_New_Game(playing_against_bot, human_is_white);
-            Board_Renderer.Flip_Board(!human_is_white);
-
-            Clear_Selection();
-            Board_Renderer.Draw_Board(Game_Controller.Board);
         }
 
         private void Clear_Selection()
@@ -183,6 +139,7 @@ namespace Chess_UI
             if (square >= 0 && square < 64)
             {
                 int piece = Game_Controller.Board.Square[square];
+                
                 if (piece != (int)EPiece_Type.None && APiece.Is_Color(piece, Game_Controller.Board.Move_Color))
                 {
                     Start_Dragging(square, point);
@@ -428,7 +385,9 @@ namespace Chess_UI
 
         private void On_Restart_Game()
         {
-            Game_Controller.Start_New_Game(Game_Controller.Playing_Against_Bot, Game_Controller.Human_Is_White);
+            Game_Controller.Start_New_Game(Game_Controller.Current_Settings);
+
+            //Game_Controller.Start_New_Game(Game_Controller.Playing_Against_Bot, Game_Controller.Human_Is_White);
             Board_Renderer.Draw_Board(Game_Controller.Board);
             Clear_Selection();
             Menu_Container.Content = null;

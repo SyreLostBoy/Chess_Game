@@ -17,34 +17,34 @@ namespace Chess_Engine.Core
         public const int Max_Moves = 256;
         public EPromotion_Mode Promotion_Mode = EPromotion_Mode.All;
 
-        ABoard Board;
-        int Curr_Move_Index;
-        bool Generate_Quiet_Moves;
+        private ABoard Board;
+        private int Curr_Move_Index;
+        private bool Generate_Quiet_Moves;
+         
+        private bool Is_White_To_Move;
+        private int Friendly_Color, Opponent_Color;
+        private int Friendly_King_Square;
+        private int Friendly_Index;
+        private int Enemy_Index;
 
-        bool Is_White_To_Move;
-        int Friendly_Color, Opponent_Color;
-        int Friendly_King_Square;
-        int Friendly_Index;
-        int Enemy_Index;
-
-        bool In_Check, In_Double_Check;
-        ulong Check_Ray_Bitmask;
-        ulong Pin_Rays;
-        ulong Not_Pin_Rays;
-        ulong Opponent_Attack_Map_No_Pawns;
+        private bool In_Check, In_Double_Check;
+        private ulong Check_Ray_Bitmask;
+        private ulong Pin_Rays;
+        private ulong Not_Pin_Rays;
+        private ulong Opponent_Attack_Map_No_Pawns;
         public ulong Opponent_Attack_Map;
         public ulong Opponent_Pawn_Attack_Map;
-        ulong Opponent_Sliding_Attack_Map;
-
-        ulong Enemy_Pieces, Friendly_Pieces;
-        ulong All_Pieces;
-        ulong Empty_Squares;
-        ulong Empty_Or_Enemy_Squares;
-        ulong Move_Type_Mask;
-
-        const int White_Pawn_Push_Dir = 1;
-        const int Black_Pawn_Push_Dir = -1;
-        const int Squares_Per_Rank = 8;
+        private ulong Opponent_Sliding_Attack_Map;
+        
+        private ulong Enemy_Pieces, Friendly_Pieces;
+        private ulong All_Pieces;
+        private ulong Empty_Squares;
+        private ulong Empty_Or_Enemy_Squares;
+        private ulong Move_Type_Mask;
+        
+        private const int White_Pawn_Push_Dir = 1;
+        private const int Black_Pawn_Push_Dir = -1;
+        private const int Squares_Per_Rank = 8;
 
         public Span<SMove> Generate_Moves(ABoard board, bool captures_only = false)
         {

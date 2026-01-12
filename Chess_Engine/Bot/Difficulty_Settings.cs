@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 
 namespace Chess_Engine.Bot
 {
+    public enum EDifficulty
+    {
+        Beginner,
+        Intermediate,
+        Advanced,
+        Expert,
+        Master
+    }
+
     public class ADifficulty_Settings
     {
         public int Max_Depth { get; set; }

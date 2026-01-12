@@ -414,9 +414,8 @@ namespace Program
     {
         static void Main(string[] args)
         {
-            var perft_test = new Perft_Test();
+            Perft_Test perft_test = new Perft_Test();
 
-            // Для Position 4
             perft_test.Run_Standard_Tests();
 
             perft_test.Performance_Test();

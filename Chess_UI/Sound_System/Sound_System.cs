@@ -13,17 +13,19 @@ namespace Sound_System
         
         private SoundPlayer Player;
 
-
-
         public AsSound_System()
         {
             Player = new SoundPlayer();
         }
 
         public void Play_Move_Sound(SMove move, bool has_captured = false)
-        {
+        { 
             string sound_path;
 
+            if (!Enabled)
+            {
+                return;
+            }
 
             if (has_captured)
             {

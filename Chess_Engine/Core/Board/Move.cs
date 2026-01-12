@@ -16,7 +16,7 @@ namespace Chess_Engine.Core
 
     public struct SMove
     {
-        readonly ushort Move_Value; // 16 битное представление хода
+        public readonly ushort Move_Value; // 16 битное представление хода
 
         // Флаги
         public const int No_Flag = 0b0000;

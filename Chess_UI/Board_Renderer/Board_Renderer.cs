@@ -56,8 +56,8 @@ namespace Chess_UI.Board_Renderer
         {
             for (int i = 0; i < 64; i++)
             {
-                int boardSquare = AsCoordinate_Helper.Get_UI_Index_From_Board_Square(i, Is_Board_Flipped);
-                int piece = board.Square[boardSquare];
+                int board_square = AsCoordinate_Helper.Get_UI_Index_From_Board_Square(i, Is_Board_Flipped);
+                int piece = board.Square[board_square];
 
                 Piece_Images[i].Source = AsImage_Helper.Get_Image(piece);
                 Piece_Images[i].Opacity = 1.0;
@@ -76,11 +76,11 @@ namespace Chess_UI.Board_Renderer
             }
 
             // Подсветка возможных ходов
-            foreach (int targetSquare in move_cache.Keys)
+            foreach (int target_square in move_cache.Keys)
             {
-                if (targetSquare >= 0 && targetSquare < 64)
+                if (target_square >= 0 && target_square < 64)
                 {
-                    int ui_index = AsCoordinate_Helper.Get_UI_Index_From_Board_Square(targetSquare, Is_Board_Flipped);
+                    int ui_index = AsCoordinate_Helper.Get_UI_Index_From_Board_Square(target_square, Is_Board_Flipped);
                     Highlight_Borders[ui_index].Background = new SolidColorBrush(HighlightColor);
                 }
             }

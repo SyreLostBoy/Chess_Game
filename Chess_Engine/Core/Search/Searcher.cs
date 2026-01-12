@@ -11,10 +11,6 @@ namespace Chess_Engine.Core
         private const int Positive_Infinity = 9999999;
         private const int Negative_Infinity = -Positive_Infinity;
 
-        //private int Transposition_Table_Size_MB = 64;
-        //private int Max_Search_Depth = 256;
-        public bool Use_Advanced_Search { get;  set;}
-
         public event Action<SMove>? On_Search_Complete;
 
         public int Current_Depth;
@@ -282,26 +278,6 @@ namespace Chess_Engine.Core
                     eval = -Search(ply_remaining - 1 - reduce_depth, ply_from_root + 1, -alpha - 1, -alpha, num_extensions, move, is_capture);
                     needs_full_search = eval > alpha;
                 }
-
-                //if (Difficulty_Settings.Use_Null_Move && needs_full_search && !Board.Is_In_Check() && ply_remaining >= 3 && !is_capture)
-                //{// Null Move Pruning
-                //    Board.Make_Null_Move();
-                //    int null_move_reduction = 2 + ply_remaining / 6;
-                //    int null_score = -Search(ply_remaining - 1 - null_move_reduction, ply_from_root + 1, -beta, -beta + 1, num_extensions, move, is_capture);
-                //    Board.Unmake_Null_Move();
-
-                //    if (null_score >= beta)
-                //    {
-                //        Board.Unmake_Move(moves[i], is_search: true);
-
-                //        if (ply_from_root > 0)
-                //        {
-                //            Repetition_Table.Try_Pop();
-                //        }
-
-                //        return beta;
-                //    }
-                //}
 
                 if (needs_full_search)
                 {

@@ -29,7 +29,7 @@ namespace Chess_Engine.Core
             new SCoordinate(-1, -1)
         };
 
-        public static readonly int[][] Num_Squares_To_Edge; // Сохраняет количество ходов, доступных в каждом из 8 направлений для каждой клетки на доске.
+        public static readonly int[][] Num_Squares_To_Edge; // Сохраняет количество ходов, доступных в каждом из 8 направлений для каждой клетки до края доски.
 
         public static readonly byte[][] Knight_Moves; // Хранит массив индексов для каждой клетки, на которую может сходить конь с любой клетки доски.
         public static readonly byte[][] King_Moves;

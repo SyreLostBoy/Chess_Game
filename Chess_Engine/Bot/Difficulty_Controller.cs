@@ -14,7 +14,7 @@ namespace Chess_Engine.Bot
     {
         public EDifficulty Current_Difficulty { get; private set; }
         public ADifficulty_Settings Current_Settings { get; private set; }
-        private readonly Random random = new Random();
+        private readonly Random Random = new Random();
         private string Settings_Path = "";
 
         public ADifficulty_Controller()
@@ -28,7 +28,7 @@ namespace Chess_Engine.Bot
         {
             Current_Difficulty = difficulty;
             Current_Settings = ADifficulty_Settings.Get_Preset(Current_Difficulty);
-            Current_Settings.Apply_Randomness(random);
+            Current_Settings.Apply_Randomness(Random);
             Save_Settings();
         }
 
